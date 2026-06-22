@@ -25,10 +25,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('../firstp')); // Serve static files from the firstp directory
 
 
-// Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✓ Connected to MongoDB'))
-  .catch(err => console.error('✗ MongoDB connection error:', err));
+// Database Connection — cached for Vercel serverless (avoids new connection per request)
+let isConnected = false;
+async function connectDB() {
+  if (isConnected) return;
+  await mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000,
+  });
+  isConnected = true;
+  console.log('✓ Connected to MongoDB');
+}
+connectDB().catch(err => console.error('✗ MongoDB connection error:', err));
 
 // Routes
 app.get('/', (req, res) => {
