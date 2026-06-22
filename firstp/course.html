@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details | EDUCATION CODING HUB</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .course-layout {
+            display: flex;
+            gap: 40px;
+            padding: 120px 40px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            flex: 0 0 280px;
+            position: sticky;
+            top: 100px;
+            height: calc(100vh - 140px);
+            background: rgba(15, 23, 42, 0.85);
+            /* More opaque */
+            backdrop-filter: blur(8px);
+            /* Reduced */
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) transparent;
+            will-change: transform;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .sidebar-link.h3-link {
+            padding-left: 25px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Content Area Styling */
+        .main-content {
+            flex: 1;
+            min-width: 0;
+            /* Prevent flex overflow */
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.9);
+            /* More opaque */
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 100px;
+            z-index: 90;
+            will-change: transform;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .detail-header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 30px;
+        }
+
+        .detail-title {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            will-change: opacity;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .detail-content {
+            background: rgba(30, 41, 59, 0.5);
+            /* backdrop-filter removed for scrolling area performance */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            will-change: transform;
+        }
+
+        .detail-content h1,
+        .detail-content h2,
+        .detail-content h3 {
+            margin-top: 2em;
+            margin-bottom: 1em;
+            color: white;
+            scroll-margin-top: 120px;
+            /* Offset for sticky navbar */
+        }
+
+        .detail-content h1 {
+            font-size: 2.2rem;
+        }
+
+        .detail-content h2 {
+            font-size: 1.8rem;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+
+        .detail-content h3 {
+            font-size: 1.4rem;
+            color: #a5b4fc;
+        }
+
+        .detail-content p {
+            margin-bottom: 1.5rem;
+            color: #cbd5e1;
+        }
+
+        .detail-content ul,
+        .detail-content ol {
+            margin-left: 25px;
+            margin-bottom: 1.5rem;
+            padding-left: 0;
+        }
+
+        .detail-content li {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+
+        .detail-content code {
+            background: rgba(100, 244, 172, 0.1);
+            color: #64f4ac;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95em;
+        }
+
+        .detail-content pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 2em 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .sidebar {
+                display: none;
+                /* Hide sidebar on small screens or convert to menu */
+            }
+
+            .course-layout {
+                padding: 100px 20px 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">EDUCATION CODING HUB</div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Ask AI Search..." id="ai-search">
+                        <span class="ai-tag">AI</span>
+                        <span class="ai-status-dot"></span>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="course-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">
+                <span>📋</span> Topics
+            </div>
+            <ul class="sidebar-menu" id="sidebar-topics">
+                <li style="color: #666; font-size: 0.9rem;">Loading topics...</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <a href="index.html" class="back-link">← Back to Courses</a>
+
+            <div id="loading">Loading course details...</div>
+
+            <div id="course-content" style="display: none;">
+                <div class="detail-header">
+                    <span style="font-size: 4rem; display: block; margin-bottom: 15px;" id="course-icon"></span>
+                    <h1 class="detail-title" id="course-name"></h1>
+                    <div class="detail-meta">
+                        <span class="tag" id="course-tag"></span>
+                    </div>
+                    <p id="course-description" style="font-size: 1.3rem; color: #94a3b8;"></p>
+                </div>
+
+                <div class="detail-content" id="full-content"></div>
+
+                <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="window.location.href='index.html'">Keep Growing 🚀</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Coding Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // API_URL is already defined in script.js
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get Course ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+
+            if (!courseId) {
+                document.getElementById('loading').textContent = 'Course ID not found.';
+                return;
+            }
+
+            try {
+                // Fetch from backend API instead of local json
+                const response = await fetch(`${API_URL}/api/courses/${courseId}`);
+                if (!response.ok) throw new Error('Course not found or server error');
+
+                const course = await response.json();
+                renderCourse(course);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: red; padding: 20px; text-align: center;">
+                        <h2>Oops! Could not load course.</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        function renderCourse(course) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('course-content').style.display = 'block';
+
+            document.title = `${course.name} | EDUCATION CODING HUB`;
+            document.getElementById('course-icon').textContent = course.icon;
+            document.getElementById('course-name').textContent = course.name;
+            document.getElementById('course-description').textContent = course.description;
+
+            const tagEl = document.getElementById('course-tag');
+            tagEl.textContent = course.tag;
+            tagEl.className = `tag ${course.tagClass}`;
+
+            document.getElementById('full-content').innerHTML = `
+                <div style="text-align:center; padding: 40px; color: #a5b4fc;">
+                    <h2>👈 Please select a topic from the sidebar to start learning!</h2>
+                </div>
+            `;
+
+            // Generate Sidebar Topics from course API data
+            generateSidebarTopics(course.topics);
+        }
+
+        function generateSidebarTopics(topics) {
+            const sidebarMenu = document.getElementById('sidebar-topics');
+            sidebarMenu.innerHTML = '';
+
+            if (!topics || topics.length === 0) {
+                sidebarMenu.innerHTML = '<li style="color: #666; font-size: 0.9rem;">No topics found</li>';
+                return;
+            }
+
+            topics.forEach((topic, index) => {
+                const id = 'topic-' + index;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.className = 'sidebar-link';
+                a.textContent = topic;
+
+                a.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    // Update active state
+                    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+                    a.classList.add('active');
+
+                    // Load content dynamically
+                    await loadTopicContent(topic);
+                });
+
+                li.appendChild(a);
+                sidebarMenu.appendChild(li);
+            });
+
+            // Auto-load first topic
+            if (topics.length > 0) {
+                loadTopicContent(topics[0]);
+                setTimeout(() => {
+                    const firstLink = sidebarMenu.querySelector('.sidebar-link');
+                    if (firstLink) firstLink.classList.add('active');
+                }, 100);
+            }
+        }
+
+        async function loadTopicContent(topicName) {
+            const contentArea = document.getElementById('full-content');
+
+            // Show loading state
+            contentArea.innerHTML = `
+                <div style="text-align:center; padding: 60px;">
+                    <div style="animation: spin 1s linear infinite; display: inline-block; font-size: 3rem; margin-bottom: 20px;">⚙️</div>
+                    <h2 style="color: #a5b4fc;">Loading content for "${topicName}"...</h2>
+                </div>
+            `;
+
+            // Ensure animation exist via inject
+            if (!document.getElementById('spin-keyframes')) {
+                const style = document.createElement('style');
+                style.id = 'spin-keyframes';
+                style.innerHTML = '@keyframes spin { 100% { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+
+            try {
+                let finalHtml = '';
+                let gptSuccess = false;
+
+                // 1. Try Fetching from Backend ChatGPT Endpoint
+                try {
+                    const aiRes = await fetch(`${API_URL}/api/generate-content`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ topic: typeof topicName === 'string' ? topicName : topicName.toString() })
+                    });
+
+                    const data = await aiRes.json();
+                    if (aiRes.ok && data.content) {
+                        finalHtml = formatMarkdownForAI(data.content);
+                        gptSuccess = true;
+                    } else {
+                        console.warn("ChatGPT Failed:", data.error);
+                    }
+                } catch (e) {
+                    console.error("Backend AI API fetch error", e);
+                }
+
+                // 2. Fallback to Free Wikipedia API if ChatGPT fails
+                if (!gptSuccess) {
+                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> ChatGPT API Key not configured. Falling back to Free Open Wikipedia content.</div>';
+                    try {
+                        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
+                        if (wikiRes.ok) {
+                            const wikiData = await wikiRes.json();
+                            if (wikiData.extract_html) finalHtml += wikiData.extract_html;
+                        } else {
+                            // Search alternative
+                            const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(topicName)}&utf8=&format=json&origin=*`);
+                            const searchData = await searchRes.json();
+                            if (searchData.query.search.length > 0) {
+                                const wikiRes2 = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchData.query.search[0].title)}`);
+                                const wikiData2 = await wikiRes2.json();
+                                if (wikiData2.extract_html) finalHtml += wikiData2.extract_html;
+                            }
+                        }
+                    } catch (e) {
+                        finalHtml += '<p style="color:#f87171">Error connecting to fallback API.</p>';
+                    }
+                }
+
+                // YouTube Embed
+                let videoIframe = '<p style="color: #94a3b8; text-align: center; padding: 40px;">Searching for video tutorial...</p>';
+                try {
+                    const ytRes = await fetch(`${API_URL}/api/youtube-search?q=${encodeURIComponent(topicName + ' tutorial programming hindi')}`);
+                    if (ytRes.ok) {
+                        const ytData = await ytRes.json();
+                        videoIframe = `
+                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
+                                src="https://www.youtube.com/embed/${ytData.videoId}" 
+                                allowfullscreen>
+                            </iframe>
+                        `;
+                    } else {
+                        videoIframe = '<p style="color: #f87171; text-align: center; padding: 40px;">Video tutorial currently unavailable.</p>';
+                    }
+                } catch (e) {
+                    console.error("YouTube search error", e);
+                    videoIframe = '<p style="color: #f87171; text-align: center; padding: 40px;">Video search failed to load.</p>';
+                }
+
+                const youtubeEmbed = `
+                    <div style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
+                        <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                            <span style="color: red;">▶</span> Watch Video Tutorial
+                        </h2>
+                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(0,0,0,0.2);">
+                            ${videoIframe}
+                        </div>
+                    </div>
+                `;
+
+                contentArea.innerHTML = `
+                    <h1 style="color: white; margin-bottom: 30px; font-size: 2.8rem; border-bottom: 4px solid #667eea; display: inline-block; padding-bottom: 10px;">${topicName}</h1>
+                    <div class="detail-content">
+                        ${finalHtml}
+                    </div>
+                    ${youtubeEmbed}
+                `;
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                contentArea.innerHTML = `<h2 style="color:#f87171; text-align: center;">Oops! Error loading content.</h2>`;
+                console.error(error);
+            }
+        }
+
+        // Robust Markdown Parser using Marked library
+        function formatMarkdownForAI(text) {
+            if (!text) return '';
+            try {
+                return marked.parse(text);
+            } catch (e) {
+                console.error("Marked parsing failed, falling back to basic text:", e);
+                return text;
+            }
+        }
+    </script>
+</body>
+
+</html>

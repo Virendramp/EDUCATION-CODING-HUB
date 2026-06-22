@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Explore | EDUCATION CODING HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .topic-layout {
+            padding: 120px 40px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 100px;
+            z-index: 90;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .detail-content {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.8;
+            font-size: 1.15rem;
+            color: #cbd5e1;
+        }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .detail-content h1, .detail-content h2, .detail-content h3 {
+            margin-top: 2em; margin-bottom: 1em; color: white;
+        }
+        .detail-content h1 { font-size: 2.2rem; }
+        .detail-content h2 { font-size: 1.8rem; border-left: 4px solid #667eea; padding-left: 15px; }
+        .detail-content h3 { font-size: 1.4rem; color: #a5b4fc; }
+        .detail-content p { margin-bottom: 1.5rem; color: #cbd5e1; }
+        .detail-content ul, .detail-content ol { margin-left: 25px; margin-bottom: 1.5rem; padding-left: 0; }
+        .detail-content li { margin-bottom: 0.5rem; color: #cbd5e1; }
+        .detail-content pre { background: #0f172a; padding: 25px; border-radius: 12px; overflow-x: auto; margin: 2em 0; border: 1px solid rgba(255, 255, 255, 0.05); color: #e2e8f0;}
+        .detail-content code { background: rgba(100, 244, 172, 0.1); color: #64f4ac; padding: 4px 8px; border-radius: 6px; font-family: 'Fira Code', monospace;}
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">EDUCATION CODING HUB</div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Ask AI Search..." id="ai-search">
+                        <span class="ai-tag">AI</span>
+                        <span class="ai-status-dot"></span>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="topic-layout">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <main class="main-content" id="full-content">
+            <div style="text-align:center; padding: 60px;">
+                <div style="animation: spin 1s linear infinite; display: inline-block; font-size: 3rem; margin-bottom: 20px;">⚙️</div>
+                <h2 style="color: #a5b4fc;">AI is writing a deeply insightful article about this topic...</h2>
+                <p>Please wait a moment while we fetch the best insights for you.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Coding Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const STATIC_ARTICLES = {
+            "logical thinking": `# Logical Thinking - The Heart of Coding
+
+## 1. What is Logical Thinking?
+Logical thinking is the process of using reasoning to come to a conclusion. It involves analyzing a situation or problem, identifying the facts, and using those facts to solve the problem in a step-by-step manner. It is about thinking clearly, objectively, and without bias.
+
+## 2. Why is it Useful?
+Logical thinking is not just for programmers; it is a life skill.
+- **Better Decision Making**: Helps you weigh pros and cons effectively.
+- **Problem Solving**: You learn to approach problems systematically rather than emotionally.
+- **Efficiency**: Helps in finding the most effective solution with the least amount of effort.
+- **Communication**: Logical thinkers can explain complex ideas clearly and structurally.
+
+## 3. Why Logic in Coding?
+Code is essentially logic written in a language a computer understands. Without logic, code is just syntax.
+- **Algorithm Design**: Before writing code, you need a logical plan (algorithm) to solve the task.
+- **Debugging**: Finding errors requires logical deduction to trace where things went wrong.
+- **Optimization**: Writing cleaner, faster code requires understanding the logic behind data flow.
+- **Complex Systems**: Building large apps requires breaking them down into smaller, logical components.
+
+## 4. How to Improve Logical Thinking?
+1. **Break it Down**: Divide big problems into smaller, manageable parts.
+2. **Ask Why**: Always dig deeper to understand the root cause.
+3. **Practice Algorithms**: Solve puzzles, Sudoku, or coding challenges (like LeetCode/HackerRank).
+4. **Flowcharts**: Visualize the process before implementation.`,
+
+            "career opportunities in tech": `# Career Opportunities in Tech
+
+## 1. Introduction
+The technology sector is one of the fastest-growing industries in the world. Learning to code opens doors to a wide variety of roles in diverse sectors, ranging from healthcare and finance to entertainment and automotive.
+
+## 2. Key Tech Roles
+- **Software Engineer / Full-Stack Developer**: Designing, building, and maintaining software applications and websites.
+- **Data Scientist / AI Engineer**: Analyzing massive amounts of data, building machine learning models, and generating actionable insights.
+- **Cloud Solutions Architect**: Designing and managing cloud infrastructure (AWS, Azure, GCP) to ensure reliability and scalability.
+- **Cybersecurity Specialist**: Protecting systems, networks, and data from digital attacks and threats.
+- **Product Manager**: Bridging the gap between business, design, and engineering teams to define and ship successful products.
+
+## 3. Top Tech Employers
+- **FAANG / Big Tech**: Giants like Google, Microsoft, Apple, Amazon, and Meta offer massive scale, learning opportunities, and top-tier compensation.
+- **High-Growth Startups**: Fast-paced environments where you can make a huge impact quickly, wear many hats, and learn rapidly.
+- **Non-Tech Industries**: Banking, healthcare, retail, and manufacturing sectors are transforming digitally and hiring software engineers at record rates.
+
+## 4. Building Your Tech Career Path
+1. **Master the Fundamentals**: Pick a language (Python, JavaScript, Java, C++) and master basic computer science concepts (Data Structures & Algorithms).
+2. **Build Portfolio Projects**: Create real-world applications that solve actual problems and publish them on GitHub.
+3. **Contribute to Open Source**: Collaborate with other developers worldwide on public repositories.
+4. **Network and Prepare**: Attend meetups, hackathons, and practice coding challenges on platforms like LeetCode.`,
+
+            "global impact of coding": `# Global Impact of Coding
+
+## 1. Introduction
+Software has revolutionized the world we live in. From simple automation scripts to complex machine learning models, code is the engine behind global transformation.
+
+## 2. Areas of Global Impact
+- **Healthcare & Medicine**: Coding powers advanced diagnostic tools, robotic surgery systems, genomic sequencing pipelines, and global tracking systems for infectious diseases.
+- **Education Access**: E-learning platforms, online repositories, and educational applications democratize education, allowing anyone with an internet connection to learn anything.
+- **Environmental Sustainability**: Computational models analyze climate data, optimize energy grids, predict natural disasters, and design smart systems to reduce carbon footprints.
+- **Financial Inclusion**: FinTech applications, digital wallets, and blockchain technology allow unbanked populations globally to access financial services, send payments, and build businesses.
+- **Communication & Connection**: Social networks, video conferencing, and messaging services bridge distances and bring families, friends, and colleagues together globally.
+
+## 3. Real-World Case Studies
+- **AI for Diagnostic Imaging**: Machine learning algorithms can detect anomalies like cancers in scans with accuracy matching or exceeding human specialists.
+- **Smart Agriculture**: Code controls sensors, drones, and automated irrigation systems to optimize crop yields and save water.
+- **Disaster Response Systems**: Real-time geolocation data and communication routing help emergency responders locate survivors and coordinate relief efforts.
+
+## 4. The Future of Code's Impact
+As we move towards a future dominated by Artificial Intelligence, Quantum Computing, and the Internet of Things (IoT), the potential of code to solve humanity's greatest challenges is unlimited. Coding is not just about making apps; it's about building a better tomorrow.`
+        };
+
+        // Aliases for matching multiple title variants
+        STATIC_ARTICLES["career opportunities"] = STATIC_ARTICLES["career opportunities in tech"];
+        STATIC_ARTICLES["global impact"] = STATIC_ARTICLES["global impact of coding"];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const topicName = urlParams.get('title');
+            const contentArea = document.getElementById('full-content');
+
+            if (!topicName) {
+                contentArea.innerHTML = '<h2 style="color:#f87171; text-align:center;">No topic specified.</h2>';
+                return;
+            }
+            
+            document.title = `${topicName} | EDUCATION CODING HUB`;
+
+            const staticKey = topicName.toLowerCase().trim();
+            if (STATIC_ARTICLES[staticKey]) {
+                const finalHtml = formatMarkdownForAI(STATIC_ARTICLES[staticKey]);
+                contentArea.innerHTML = `
+                    <h1 style="color: white; margin-bottom: 30px; font-size: 3rem; border-bottom: 4px solid #667eea; display: inline-block; padding-bottom: 10px;">${topicName}</h1>
+                    <div class="detail-content">
+                        ${finalHtml}
+                    </div>
+                    <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">Explore More 🚀</button>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                let finalHtml = '';
+                // Ask Backend AI API to generate the article
+                const aiRes = await fetch(`${API_URL}/api/generate-content`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: "A fascinating coding or tech article about: " + topicName + " in the context of computer science and its impact on the world." })
+                });
+
+                const data = await aiRes.json();
+                if (aiRes.ok && data.content) {
+                    finalHtml = formatMarkdownForAI(data.content);
+                } else {
+                    console.warn("ChatGPT Failed:", data.error);
+                    // Fallback to Wikipedia
+                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> AI Server overloaded. Showing fallback content.</div>';
+                    const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
+                    if (wikiRes.ok) {
+                        const wikiData = await wikiRes.json();
+                        if (wikiData.extract_html) finalHtml += wikiData.extract_html;
+                    }
+                }
+
+                contentArea.innerHTML = `
+                    <h1 style="color: white; margin-bottom: 30px; font-size: 3rem; border-bottom: 4px solid #667eea; display: inline-block; padding-bottom: 10px;">${topicName}</h1>
+                    <div class="detail-content">
+                        ${finalHtml}
+                    </div>
+                    <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">Explore More 🚀</button>
+                    </div>
+                `;
+
+            } catch (error) {
+                contentArea.innerHTML = `<h2 style="color:#f87171; text-align: center;">Oops! Error loading content.</h2><p style="text-align:center; color:#cbd5e1;">${error.message}</p>`;
+                console.error(error);
+            }
+        });
+
+        // Robust Markdown Parser using Marked library
+        function formatMarkdownForAI(text) {
+            if (!text) return '';
+            try {
+                return marked.parse(text);
+            } catch (e) {
+                console.error("Marked parsing failed, falling back to basic text:", e);
+                return text;
+            }
+        }
+    </script>
+</body>
+
+</html>

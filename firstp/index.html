@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">EDUCATION CODING HUB</div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#clubs" class="nav-link">Clubs</a></li>
+                <li>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Ask AI Search..." id="ai-search">
+                        <span class="ai-tag">AI</span>
+                        <span class="ai-status-dot"></span>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="animated-text-container">
+                <h1 class="animated-title" id="animatedText">MASTER CODING</h1>
+                <p class="animated-subtitle">Learn • Build • Innovate</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary">Explore Clubs →</button>
+                    <button class="btn btn-secondary">Learn More ↓</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Coding Matters Section -->
+    <section class="why-coding">
+        <div class="container">
+            <div class="why-content">
+                <div class="why-text scroll-reveal">
+                    <h2>Why <span class="highlight">Coding</span> Matters?</h2>
+                    <p>In today's digital era, coding is more than just a skill—it's the language of the future. It
+                        empowers students to solve complex problems, innovate new solutions, and think logically.</p>
+                </div>
+                <div class="why-cards">
+                    <div class="card scroll-reveal" style="animation-delay: 0.1s; cursor: pointer;" onclick="window.location.href='topic.html?title=Logical+Thinking'">
+                        <div class="card-icon">💡</div>
+                        <h3>Logical Thinking</h3>
+                        <p>Enhances analytical skills and structured problem solving.</p>
+                    </div>
+                    <div class="card card-featured scroll-reveal" style="animation-delay: 0.3s; cursor: pointer;" onclick="window.location.href='topic.html?title=Career+Opportunities+in+Tech'">
+                        <div class="card-icon">💼</div>
+                        <h3>Career Opportunities</h3>
+                        <p>Opens doors to top-tier tech giants and innovative startups.</p>
+                    </div>
+                    <div class="card scroll-reveal" style="animation-delay: 0.5s; cursor: pointer;" onclick="window.location.href='topic.html?title=Global+Impact+of+Coding'">
+                        <div class="card-icon">🌍</div>
+                        <h3>Global Impact</h3>
+                        <p>Build software that can change lives around the world.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses" id="clubs">
+        <div class="container">
+            <h2>Our Courses</h2>
+            <p class="section-subtitle">From foundational logic to full-stack deployment, we cover it all.</p>
+            <div class="courses-grid">
+                <!-- Courses will be loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Coding Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>
