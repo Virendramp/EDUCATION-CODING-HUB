@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "firstp/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server.js"
+    },
+    {
+      "src": "/(style\\.css|script\\.js|courses\\.json)",
+      "dest": "firstp/$1"
+    },
+    {
+      "src": "/course\\.html",
+      "dest": "firstp/course.html"
+    },
+    {
+      "src": "/topic\\.html",
+      "dest": "firstp/topic.html"
+    },
+    {
+      "src": "^/$",
+      "dest": "firstp/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "firstp/$1"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 // Backend API Connection
-const API_URL = 'http://127.0.0.1:5000';
+// Empty string = relative URL, works on Vercel and local dev via backend server
+const API_URL = '';
 
 // Typewriter effect - letters type out and delete one by one
 const phrases = [
