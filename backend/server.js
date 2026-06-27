@@ -26,16 +26,84 @@ app.use(express.static('../firstp')); // Serve static files from the firstp dire
 
 
 // Database Connection — cached for Vercel serverless (avoids new connection per request)
-let isConnected = false;
+let cachedConnection = null;
+
 async function connectDB() {
-  if (isConnected) return;
-  await mongoose.connect(process.env.MONGODB_URI, {
+  if (cachedConnection) {
+    return cachedConnection;
+  }
+
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI is not defined in environment variables');
+  }
+
+  cachedConnection = mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 5000,
+  }).then((mongooseInstance) => {
+    console.log('✓ Connected to MongoDB');
+    return mongooseInstance;
+  }).catch((err) => {
+    cachedConnection = null;
+    throw err;
   });
-  isConnected = true;
-  console.log('✓ Connected to MongoDB');
+
+  return cachedConnection;
 }
-connectDB().catch(err => console.error('✗ MongoDB connection error:', err));
+
+// Global middleware to ensure database connection before processing requests
+const ensureDbConnection = async (req, res, next) => {
+  const dbFreeRoutes = ['/api/youtube-search', '/api/ask-ai', '/api/debug-db'];
+  console.log(`[ensureDbConnection] path=${req.path}, skip=${dbFreeRoutes.includes(req.path)}`);
+  if (dbFreeRoutes.includes(req.path)) {
+    return next();
+  }
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection middleware error:', err);
+    res.status(500).json({ error: 'Database connection failed: ' + err.message, stack: err.stack });
+  }
+};
+app.use('/api', ensureDbConnection);
+
+// Diagnostics endpoint to verify environment variables and database connectivity
+app.get('/api/debug-db', async (req, res) => {
+  try {
+    const mongoUriDefined = !!process.env.MONGODB_URI;
+    const connectionState = mongoose.connection.readyState;
+    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    
+    let dbError = null;
+    let dbStatus = 'Not Attempted';
+    if (mongoUriDefined) {
+      try {
+        await connectDB();
+        dbStatus = 'Successfully Connected';
+      } catch (err) {
+        dbStatus = 'Connection Failed';
+        dbError = err.message;
+      }
+    }
+
+    res.json({
+      env: {
+        MONGODB_URI_DEFINED: mongoUriDefined,
+        MONGODB_URI_VAL: mongoUriDefined ? `${process.env.MONGODB_URI.substring(0, Math.min(25, process.env.MONGODB_URI.length))}...` : null,
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL || 'not_running_on_vercel'
+      },
+      connection: {
+        readyState: connectionState,
+        currentState: states[connectionState] || 'unknown',
+        status: dbStatus,
+        error: dbError
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -49,7 +117,7 @@ app.get('/api/courses', async (req, res) => {
     res.json(courses);
   } catch (err) {
     console.error('Error fetching courses:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error', details: err.message, stack: err.stack });
   }
 });
 
@@ -65,7 +133,7 @@ app.get('/api/courses/:id', async (req, res) => {
     }
   } catch (err) {
     console.error('Error fetching course:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error', details: err.message, stack: err.stack });
   }
 });
 
