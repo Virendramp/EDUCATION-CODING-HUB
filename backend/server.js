@@ -52,7 +52,7 @@ async function connectDB() {
 
 // Global middleware to ensure database connection before processing requests
 const ensureDbConnection = async (req, res, next) => {
-  const dbFreeRoutes = ['/api/youtube-search', '/api/ask-ai', '/api/debug-db'];
+  const dbFreeRoutes = ['/youtube-search', '/ask-ai', '/debug-db'];
   console.log(`[ensureDbConnection] path=${req.path}, skip=${dbFreeRoutes.includes(req.path)}`);
   if (dbFreeRoutes.includes(req.path)) {
     return next();
