@@ -1,6 +1,48 @@
 // Backend API Connection
-// Empty string = relative URL, works on Vercel and local dev via backend server
-const API_URL = '';
+// Automatically use port 5000 when running locally, or relative URLs when deployed
+const API_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:')
+    ? 'http://localhost:5000'
+    : '';
+
+function onDOMReady(fn) {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(fn, 1);
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+
+// Theme Initialization
+const savedTheme = localStorage.getItem('theme') || 'light';
+if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+} else {
+    document.documentElement.setAttribute('data-theme', 'light');
+}
+
+onDOMReady(() => {
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (themeToggleBtn) {
+        // Set initial icon
+        themeToggleBtn.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+        
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            let newTheme = 'dark';
+            
+            if (currentTheme !== 'light') {
+                newTheme = 'light';
+            }
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update icon
+            themeToggleBtn.textContent = newTheme === 'light' ? '🌙' : '☀️';
+        });
+    }
+});
+
 
 // Typewriter effect - letters type out and delete one by one
 const phrases = [
@@ -202,12 +244,17 @@ function renderCourses(courses) {
         courseCard.style.animationDelay = `${index * 0.15}s`;
         courseCard.dataset.courseId = course.id;
 
+        const bgImg = course.image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+
         courseCard.innerHTML = `
-            <div class="course-icon">${course.icon}</div>
-            <h3>${course.name}</h3>
-            <p>${course.description}</p>
-            <div class="course-tags">
-                <span class="tag ${course.tagClass}">${course.tag}</span>
+            <div class="course-card-bg" style="background-image: url('${bgImg}');"></div>
+            <div class="course-card-content">
+                <h3>${course.name}</h3>
+                <p>${course.description}</p>
+                <div class="course-card-footer">
+                    <span class="course-date">${course.date || '12-06-2026'}</span>
+                    <button class="btn-read">Read</button>
+                </div>
             </div>
         `;
 
@@ -256,10 +303,14 @@ function attachCourseEventListeners() {
     const submitBtn = document.querySelector('.btn-submit');
     if (submitBtn) {
         submitBtn.addEventListener('click', function (e) {
-            e.stopPropagation(); // Prevent card click if inside a card (though here it's separate)
-            const idea = prompt('What technology would you like to learn?');
-            if (idea && idea.trim() !== '') {
-                alert('Thank you! We\'ve noted your request for: ' + idea + '\n\nWe\'ll consider adding this to our course offerings!');
+            e.stopPropagation(); // Prevent card click if inside a card
+            const modal = document.getElementById('idea-modal');
+            const responseMsg = document.getElementById('idea-response-msg');
+            const ideaForm = document.getElementById('idea-form');
+            if (modal) {
+                modal.style.display = 'block';
+                if (responseMsg) responseMsg.style.display = 'none';
+                if (ideaForm) ideaForm.reset();
             }
         });
     }
@@ -273,59 +324,9 @@ function initAISearch() {
     if (!searchInput || !resultsPanel) return;
 
     let debounceTimer;
-    let activeAIFetch = null; // To track and abort ongoing fetches
 
-    const askAI = async (query) => {
-        // Abort previous fetch if still running
-        if (activeAIFetch) {
-            activeAIFetch.abort();
-        }
-        activeAIFetch = new AbortController();
-        const signal = activeAIFetch.signal;
-
-        resultsPanel.style.display = 'flex';
-        resultsPanel.innerHTML = `
-            <div class="ai-loading" style="padding: 20px; text-align: center; color: #a5b4fc;">
-                <span style="display:inline-block; animation: pulse 1.5s infinite;">✨ AI is thinking about "${query}"...</span>
-            </div>
-        `;
-        
-        try {
-            const res = await fetch(`${API_URL}/api/ask-ai`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: query }),
-                signal
-            });
-            
-            const data = await res.json();
-            
-            if (res.ok && data.answer) {
-                const formattedAnswer = data.answer
-                    .replace(/\n\n/g, '<br><br>')
-                    .replace(/\n/g, '<br>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                resultsPanel.innerHTML = `
-                    <div class="ai-answer-box" style="padding: 15px; margin: 10px; background: rgba(100, 244, 172, 0.1); border: 1px solid rgba(100, 244, 172, 0.3); border-radius: 10px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5; max-height: 300px; overflow-y: auto;">
-                        <span style="display:block; margin-bottom: 8px; font-weight: bold; color: white;">🤖 AI Answer:</span>
-                        ${formattedAnswer}
-                    </div>
-                `;
-            } else {
-                resultsPanel.innerHTML = `<div class="no-results" style="padding: 15px; color: #ef4444;">❌ AI could not answer right now: ${data.error || 'Unknown error'}</div>`;
-            }
-        } catch (err) {
-            if (err.name === 'AbortError') {
-                console.log('AI request aborted');
-            } else {
-                console.error(err);
-                resultsPanel.innerHTML = '<div class="no-results" style="padding: 15px; color: #ef4444;">❌ Connection error. Backend might be down.</div>';
-            }
-        } finally {
-            if (activeAIFetch && activeAIFetch.signal === signal) {
-                activeAIFetch = null;
-            }
-        }
+    const askAI = (query) => {
+        window.location.href = `ai-search.html?q=${encodeURIComponent(query)}`;
     };
 
     searchInput.addEventListener('keydown', (e) => {
@@ -345,7 +346,6 @@ function initAISearch() {
 
         if (query.length < 2) {
             resultsPanel.style.display = 'none';
-            if (activeAIFetch) activeAIFetch.abort();
             return;
         }
 
@@ -357,7 +357,6 @@ function initAISearch() {
         });
 
         if (filtered.length > 0) {
-            if (activeAIFetch) activeAIFetch.abort();
             renderSearchResults(filtered, query);
         } else {
             // No courses found, display a loading/thinking hint and auto-trigger AI after delay
@@ -444,22 +443,14 @@ function initAISearch() {
 
 // Initial setup on load
 console.log('➜ Setting up listeners...');
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('➜ DOMContentLoaded fired');
+onDOMReady(() => {
+    console.log('➜ DOM ready (or already ready) fired');
     // Only load all courses if we are on a page with the grid (index.html)
     if (document.querySelector('.courses-grid')) {
         loadCourses();
     }
     initAISearch();
 });
-
-// Also call immediately in case DOM is already ready
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    if (document.querySelector('.courses-grid')) {
-        console.log('➜ DOM already ready, calling loadCourses()');
-        loadCourses();
-    }
-}
 
 // Explore Clubs button
 document.querySelectorAll('.btn-primary').forEach(btn => {
@@ -540,6 +531,234 @@ async function getUserById(id) {
     }
 }
 
-
-
 console.log('Website loaded successfully!');
+
+// Hamburger Menu Logic
+onDOMReady(() => {
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        }));
+    }
+});
+
+// Submit Idea Modal Logic
+onDOMReady(() => {
+    const modal = document.getElementById('idea-modal');
+    const submitBtns = document.querySelectorAll('.submit-idea-btn'); 
+    const closeBtn = document.querySelector('.close-idea-modal');
+    const ideaForm = document.getElementById('idea-form');
+    const responseMsg = document.getElementById('idea-response-msg');
+
+    if (!modal) return;
+
+    // Open modal
+    submitBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.style.display = 'block';
+            if (responseMsg) responseMsg.style.display = 'none';
+            if (ideaForm) ideaForm.reset();
+        });
+    });
+
+    // Close modal
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
+
+    // Close when clicking outside of modal content
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    if (ideaForm) {
+        ideaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('idea-submit-btn');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+
+            const name = document.getElementById('idea-name').value;
+            const email = document.getElementById('idea-email').value;
+            const idea = document.getElementById('idea-desc').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/submit-idea`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, idea })
+                });
+
+                const result = await response.json();
+                responseMsg.style.display = 'block';
+
+                if (response.ok) {
+                    responseMsg.textContent = result.message || 'Idea submitted successfully!';
+                    responseMsg.className = 'success';
+                    ideaForm.reset();
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 3000);
+                } else {
+                    responseMsg.textContent = result.error || 'Failed to submit idea.';
+                    responseMsg.className = 'error';
+                }
+            } catch (err) {
+                console.error('Error submitting idea:', err);
+                responseMsg.style.display = 'block';
+                responseMsg.textContent = 'An error occurred. Please try again later.';
+                responseMsg.className = 'error';
+            } finally {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
+
+// Particle Background Animation (Antigravity Style)
+function initParticles() {
+    let canvas = document.getElementById('particle-canvas');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'particle-canvas';
+        document.body.prepend(canvas);
+    }
+
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    
+    // Antigravity vibrant colors
+    const colors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#8AB4F8', '#F28B82', '#FDE293', '#81C995', '#A142F4', '#24C1E0'];
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.reset(true);
+        }
+
+        reset(initial = false) {
+            // Random angle for radiating outward
+            this.angle = Math.random() * Math.PI * 2;
+            
+            if (initial) {
+                // Distribute randomly across the screen initially
+                const distance = Math.random() * (Math.max(width, height) / 1.5);
+                this.x = width / 2 + Math.cos(this.angle) * distance;
+                this.y = height / 2 + Math.sin(this.angle) * distance;
+            } else {
+                // Spawn near center when resetting
+                const distance = Math.random() * 50;
+                this.x = width / 2 + Math.cos(this.angle) * distance;
+                this.y = height / 2 + Math.sin(this.angle) * distance;
+            }
+            
+            // Speed of outward movement (slow drift)
+            this.speed = Math.random() * 0.4 + 0.1;
+            
+            // Dimensions of the dash
+            this.length = Math.random() * 8 + 4;
+            this.thickness = Math.random() * 2 + 1;
+            
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        update() {
+            this.x += Math.cos(this.angle) * this.speed;
+            this.y += Math.sin(this.angle) * this.speed;
+            
+            // If it goes off screen, reset it near the center
+            if (this.x < -50 || this.x > width + 50 || this.y < -50 || this.y > height + 50) {
+                this.reset(false);
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            // Draw a dash pointing outward along its trajectory
+            ctx.lineTo(this.x + Math.cos(this.angle) * this.length, this.y + Math.sin(this.angle) * this.length);
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = this.thickness;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+    }
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        
+        // Number of particles relative to screen size
+        const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 7000); 
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        animate();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    
+    init();
+}
+
+onDOMReady(() => {
+    initParticles();
+
+    // Hamburger Menu Logic
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+    }
+});

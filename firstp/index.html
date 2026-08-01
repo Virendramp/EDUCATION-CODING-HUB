@@ -16,6 +16,11 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">EDUCATION CODING HUB</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#clubs" class="nav-link">Clubs</a></li>
@@ -62,7 +67,7 @@
                         <h3>Logical Thinking</h3>
                         <p>Enhances analytical skills and structured problem solving.</p>
                     </div>
-                    <div class="card card-featured scroll-reveal" style="animation-delay: 0.3s; cursor: pointer;" onclick="window.location.href='topic.html?title=Career+Opportunities+in+Tech'">
+                    <div class="card scroll-reveal" style="animation-delay: 0.3s; cursor: pointer;" onclick="window.location.href='topic.html?title=Career+Opportunities+in+Tech'">
                         <div class="card-icon">💼</div>
                         <h3>Career Opportunities</h3>
                         <p>Opens doors to top-tier tech giants and innovative startups.</p>
@@ -97,6 +102,22 @@
     </footer>
 
     <script src="script.js?v=2"></script>
+
+    <!-- Submit Idea Modal -->
+    <div id="idea-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-idea-modal">&times;</span>
+            <h2>Submit an Idea</h2>
+            <p>Have an idea for a new feature or course? Let us know!</p>
+            <form id="idea-form">
+                <input type="text" id="idea-name" placeholder="Your Name" required>
+                <input type="email" id="idea-email" placeholder="Your Email" required>
+                <textarea id="idea-desc" rows="4" placeholder="Describe your idea..." required></textarea>
+                <button type="submit" class="btn btn-primary" id="idea-submit-btn">Submit</button>
+            </form>
+            <div id="idea-response-msg" style="display: none; margin-top: 15px; font-weight: 500;"></div>
+        </div>
+    </div>
 </body>
 
 </html>

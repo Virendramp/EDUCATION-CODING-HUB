@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Details | EDUCATION CODING HUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -23,12 +24,12 @@
             position: sticky;
             top: 100px;
             height: calc(100vh - 140px);
-            background: rgba(15, 23, 42, 0.85);
+            background: var(--glass-bg);
             /* More opaque */
             backdrop-filter: blur(8px);
             /* Reduced */
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: var(--glass-border);
             padding: 25px;
             overflow-y: auto;
             scrollbar-width: thin;
@@ -47,10 +48,10 @@
 
         .sidebar-title {
             font-size: 1.2rem;
-            color: white;
+            color: var(--text-white);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: var(--glass-border);
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -68,7 +69,7 @@
         }
 
         .sidebar-link {
-            color: #94a3b8;
+            color: var(--text-gray);
             text-decoration: none;
             font-size: 0.95rem;
             transition: all 0.3s ease;
@@ -101,14 +102,14 @@
         .back-link {
             display: inline-block;
             margin-bottom: 30px;
-            color: var(--primary-color);
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
-            background: rgba(15, 23, 42, 0.9);
+            background: var(--glass-bg);
             /* More opaque */
             padding: 10px 20px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: var(--glass-border);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             position: sticky;
@@ -120,24 +121,20 @@
         .back-link:hover {
             transform: translateY(-2px);
             background: rgba(102, 126, 234, 0.2);
-            color: white;
+            color: var(--text-white);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
         }
 
         .detail-header {
             margin-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: var(--glass-border);
             padding-bottom: 30px;
         }
 
         .detail-title {
             font-size: 3rem;
-            color: white;
+            color: var(--text-white);
             margin-bottom: 15px;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
             will-change: opacity;
         }
 
@@ -148,15 +145,15 @@
         }
 
         .detail-content {
-            background: rgba(30, 41, 59, 0.5);
+            background: var(--bg-card);
             /* backdrop-filter removed for scrolling area performance */
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: var(--glass-border);
             line-height: 1.8;
             font-size: 1.1rem;
-            color: #cbd5e1;
+            color: var(--text-gray);
             will-change: transform;
         }
 
@@ -165,7 +162,7 @@
         .detail-content h3 {
             margin-top: 2em;
             margin-bottom: 1em;
-            color: white;
+            color: var(--text-white);
             scroll-margin-top: 120px;
             /* Offset for sticky navbar */
         }
@@ -187,7 +184,7 @@
 
         .detail-content p {
             margin-bottom: 1.5rem;
-            color: #cbd5e1;
+            color: var(--text-gray);
         }
 
         .detail-content ul,
@@ -199,7 +196,7 @@
 
         .detail-content li {
             margin-bottom: 0.5rem;
-            color: #cbd5e1;
+            color: var(--text-gray);
         }
 
         .detail-content code {
@@ -212,13 +209,13 @@
         }
 
         .detail-content pre {
-            background: #0f172a;
+            background: #1e293b;
             color: #e2e8f0;
             padding: 25px;
             border-radius: 12px;
             overflow-x: auto;
             margin: 2em 0;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.2);
         }
 
         /* Mobile Responsiveness */
@@ -240,6 +237,11 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">EDUCATION CODING HUB</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <ul class="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
                 <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
@@ -286,9 +288,7 @@
 
                 <div class="detail-content" id="full-content"></div>
 
-                <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="window.location.href='index.html'">Keep Growing 🚀</button>
-                </div>
+
             </div>
         </main>
     </div>
@@ -300,11 +300,35 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
-    <script>
-        // API_URL is already defined in script.js
+    <!-- Submit Idea Modal -->
+    <div id="idea-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-idea-modal">&times;</span>
+            <h2>Submit an Idea</h2>
+            <p>Have an idea for a new feature or course? Let us know!</p>
+            <form id="idea-form">
+                <input type="text" id="idea-name" placeholder="Your Name" required>
+                <input type="email" id="idea-email" placeholder="Your Email" required>
+                <textarea id="idea-desc" rows="4" placeholder="Describe your idea..." required></textarea>
+                <button type="submit" class="btn btn-primary" id="idea-submit-btn">Submit</button>
+            </form>
+            <div id="idea-response-msg" style="display: none; margin-top: 15px; font-weight: 500;"></div>
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', async () => {
+    <script src="script.js?v=3"></script>
+    <script>
+        // API_URL is already defined in script.js?v=3
+
+        function onDOMReady(fn) {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+
+        onDOMReady(async () => {
             // Get Course ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id');
@@ -315,11 +339,25 @@
             }
 
             try {
-                // Fetch from backend API instead of local json
-                const response = await fetch(`${API_URL}/api/courses/${courseId}`);
-                if (!response.ok) throw new Error('Course not found or server error');
+                let course;
+                try {
+                    // Try to fetch from backend API first
+                    const response = await fetch(`${API_URL}/api/courses/${courseId}`);
+                    if (!response.ok) throw new Error('Course not found on backend');
+                    course = await response.json();
+                } catch (backendError) {
+                    console.warn('Backend fetch failed, falling back to local courses.json:', backendError.message);
+                    // Fallback to local courses.json
+                    const localRes = await fetch('./courses.json');
+                    if (!localRes.ok) throw new Error('Could not load local courses.json');
+                    
+                    const localData = await localRes.json();
+                    const coursesList = Array.isArray(localData) ? localData : localData.courses;
+                    course = coursesList.find(c => c.id == courseId);
+                    
+                    if (!course) throw new Error('Course not found locally either');
+                }
 
-                const course = await response.json();
                 renderCourse(course);
             } catch (error) {
                 console.error('Error:', error);
@@ -442,7 +480,7 @@
 
                 // 2. Fallback to Free Wikipedia API if ChatGPT fails
                 if (!gptSuccess) {
-                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> ChatGPT API Key not configured. Falling back to Free Open Wikipedia content.</div>';
+                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> We are unable to generate detailed AI content at this moment. Showing basic information instead.</div>';
                     try {
                         const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
                         if (wikiRes.ok) {

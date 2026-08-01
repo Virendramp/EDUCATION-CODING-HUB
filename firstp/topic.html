@@ -7,8 +7,7 @@
     <title>Topic Explore | EDUCATION CODING HUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -22,13 +21,13 @@
         .back-link {
             display: inline-block;
             margin-bottom: 30px;
-            color: var(--primary-color);
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
-            background: rgba(15, 23, 42, 0.9);
+            background: var(--glass-bg);
             padding: 10px 20px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: var(--glass-border);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             position: sticky;
@@ -39,34 +38,34 @@
         .back-link:hover {
             transform: translateY(-2px);
             background: rgba(102, 126, 234, 0.2);
-            color: white;
+            color: var(--text-white);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
         }
 
         .detail-content {
-            background: rgba(30, 41, 59, 0.5);
+            background: var(--bg-card);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: var(--glass-border);
             line-height: 1.8;
             font-size: 1.15rem;
-            color: #cbd5e1;
+            color: var(--text-gray);
         }
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .detail-content h1, .detail-content h2, .detail-content h3 {
-            margin-top: 2em; margin-bottom: 1em; color: white;
+            margin-top: 2em; margin-bottom: 1em; color: var(--text-white);
         }
         .detail-content h1 { font-size: 2.2rem; }
         .detail-content h2 { font-size: 1.8rem; border-left: 4px solid #667eea; padding-left: 15px; }
         .detail-content h3 { font-size: 1.4rem; color: #a5b4fc; }
-        .detail-content p { margin-bottom: 1.5rem; color: #cbd5e1; }
+        .detail-content p { margin-bottom: 1.5rem; color: var(--text-gray); }
         .detail-content ul, .detail-content ol { margin-left: 25px; margin-bottom: 1.5rem; padding-left: 0; }
-        .detail-content li { margin-bottom: 0.5rem; color: #cbd5e1; }
-        .detail-content pre { background: #0f172a; padding: 25px; border-radius: 12px; overflow-x: auto; margin: 2em 0; border: 1px solid rgba(255, 255, 255, 0.05); color: #e2e8f0;}
-        .detail-content code { background: rgba(100, 244, 172, 0.1); color: #64f4ac; padding: 4px 8px; border-radius: 6px; font-family: 'Fira Code', monospace;}
+        .detail-content li { margin-bottom: 0.5rem; color: var(--text-gray); }
+        .detail-content pre { background: #1e293b; padding: 25px; border-radius: 12px; overflow-x: auto; margin: 2em 0; border: 1px solid rgba(0, 0, 0, 0.2); color: #e2e8f0;}
+        .detail-content code { background: rgba(100, 244, 172, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-family: 'Fira Code', monospace;}
     </style>
 </head>
 
@@ -75,9 +74,15 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">EDUCATION CODING HUB</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
             <ul class="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
                 <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
                 <li>
                     <div class="search-container">
                         <span class="search-icon">🔍</span>
@@ -111,7 +116,23 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- Submit Idea Modal -->
+    <div id="idea-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-idea-modal">&times;</span>
+            <h2>Submit an Idea</h2>
+            <p>Have an idea for a new feature or course? Let us know!</p>
+            <form id="idea-form">
+                <input type="text" id="idea-name" placeholder="Your Name" required>
+                <input type="email" id="idea-email" placeholder="Your Email" required>
+                <textarea id="idea-desc" rows="4" placeholder="Describe your idea..." required></textarea>
+                <button type="submit" class="btn btn-primary" id="idea-submit-btn">Submit</button>
+            </form>
+            <div id="idea-response-msg" style="display: none; margin-top: 15px; font-weight: 500;"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=3"></script>
     <script>
         const STATIC_ARTICLES = {
             "logical thinking": `# Logical Thinking - The Heart of Coding
@@ -187,7 +208,15 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
         STATIC_ARTICLES["career opportunities"] = STATIC_ARTICLES["career opportunities in tech"];
         STATIC_ARTICLES["global impact"] = STATIC_ARTICLES["global impact of coding"];
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        function onDOMReady(fn) {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+
+        onDOMReady(async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const topicName = urlParams.get('title');
             const contentArea = document.getElementById('full-content');
@@ -207,9 +236,7 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                     <div class="detail-content">
                         ${finalHtml}
                     </div>
-                    <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="window.location.href='index.html'">Explore More 🚀</button>
-                    </div>
+
                 `;
                 return;
             }
@@ -242,9 +269,7 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                     <div class="detail-content">
                         ${finalHtml}
                     </div>
-                    <div style="margin-top: 50px; text-align: center; margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="window.location.href='index.html'">Explore More 🚀</button>
-                    </div>
+
                 `;
 
             } catch (error) {

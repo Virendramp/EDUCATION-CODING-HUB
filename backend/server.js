@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config();
+const nodemailer = require('nodemailer');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const Course = require('./models/Course');
 const TopicContent = require('./models/TopicContent');
 const ytSearch = require('yt-search');
@@ -52,7 +54,7 @@ async function connectDB() {
 
 // Global middleware to ensure database connection before processing requests
 const ensureDbConnection = async (req, res, next) => {
-  const dbFreeRoutes = ['/youtube-search', '/ask-ai', '/debug-db'];
+  const dbFreeRoutes = ['/youtube-search', '/ask-ai', '/debug-db', '/generate-content', '/submit-idea'];
   console.log(`[ensureDbConnection] path=${req.path}, skip=${dbFreeRoutes.includes(req.path)}`);
   if (dbFreeRoutes.includes(req.path)) {
     return next();
@@ -154,7 +156,14 @@ app.post('/api/generate-content', async (req, res) => {
     const { topic } = req.body;
     
     // First, check if the content already exists in the database
-    const existingContent = await TopicContent.findOne({ topicName: topic });
+    let existingContent = null;
+    try {
+      await connectDB();
+      existingContent = await TopicContent.findOne({ topicName: topic });
+    } catch (dbErr) {
+      console.warn(`[DB Warning] Could not connect to DB to check cache: ${dbErr.message}`);
+    }
+
     if (existingContent) {
       console.log(`[Cache Hit] Serving pre-generated content for topic: ${topic}`);
       return res.json({ content: existingContent.content });
@@ -198,10 +207,15 @@ app.post('/api/generate-content', async (req, res) => {
 
     // Save the newly generated content to the database for future use
     try {
-      await TopicContent.create({ topicName: topic, content: generatedContent });
-      console.log(`[Saved] Successfully stored content for topic: ${topic}`);
+      if (mongoose.connection.readyState === 1) { // 1 = connected
+        TopicContent.create({ topicName: topic, content: generatedContent })
+          .then(() => console.log(`[Saved] Successfully stored content for topic: ${topic}`))
+          .catch(dbErr => console.error('Error saving generated content to DB:', dbErr));
+      } else {
+        console.warn('[DB Warning] Skipping cache save because DB is not connected.');
+      }
     } catch (dbErr) {
-      console.error('Error saving generated content to DB:', dbErr);
+      console.error('Error in DB save block:', dbErr);
     }
 
     res.json({ content: generatedContent });
@@ -251,6 +265,56 @@ app.post('/api/ask-ai', async (req, res) => {
   } catch (err) {
     console.error('Error in Ask AI:', err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Submit Idea API
+app.post('/api/submit-idea', async (req, res) => {
+  try {
+    const { name, email, idea } = req.body;
+
+    if (!name || !email || !idea) {
+      return res.status(400).json({ error: 'Name, email, and idea are required.' });
+    }
+
+    let transporter;
+    const hasRealCredentials = process.env.EMAIL_USER && process.env.EMAIL_PASS;
+
+    if (hasRealCredentials) {
+      transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.EMAIL_USER,
+        replyTo: email,
+        subject: `New Idea Submission from ${name}`,
+        text: `You have received a new idea submission.\n\nName: ${name}\nEmail: ${email}\n\nIdea:\n${idea}`
+      };
+  
+      await transporter.sendMail(mailOptions);
+    } else {
+      // Fallback to console log if no real credentials are provided
+      console.log("=========================================");
+      console.log(`[TESTING] Idea received but no email credentials in .env!`);
+      console.log(`Name: ${name}`);
+      console.log(`Email: ${email}`);
+      console.log(`Idea: ${idea}`);
+      console.log("=========================================");
+      
+      // Artificial delay to simulate processing
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    res.status(200).json({ message: 'Idea submitted successfully!' });
+  } catch (err) {
+    console.error('Error submitting idea:', err);
+    res.status(500).json({ error: 'Failed to submit idea. Ensure email credentials are configured in .env.' });
   }
 });
 

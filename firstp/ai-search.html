@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Explore | EDUCATION CODING HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .topic-layout {
+            padding: 120px 40px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            background: var(--glass-bg);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: var(--glass-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 100px;
+            z-index: 90;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--text-white);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .detail-content {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: var(--glass-border);
+            line-height: 1.8;
+            font-size: 1.15rem;
+            color: var(--text-gray);
+        }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .detail-content h1, .detail-content h2, .detail-content h3 {
+            margin-top: 2em; margin-bottom: 1em; color: var(--text-white);
+        }
+        .detail-content h1 { font-size: 2.2rem; }
+        .detail-content h2 { font-size: 1.8rem; border-left: 4px solid #667eea; padding-left: 15px; }
+        .detail-content h3 { font-size: 1.4rem; color: #a5b4fc; }
+        .detail-content p { margin-bottom: 1.5rem; color: var(--text-gray); }
+        .detail-content ul, .detail-content ol { margin-left: 25px; margin-bottom: 1.5rem; padding-left: 0; }
+        .detail-content li { margin-bottom: 0.5rem; color: var(--text-gray); }
+        .detail-content pre { background: #1e293b; padding: 25px; border-radius: 12px; overflow-x: auto; margin: 2em 0; border: 1px solid rgba(0, 0, 0, 0.2); color: #e2e8f0;}
+        .detail-content code { background: rgba(100, 244, 172, 0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-family: 'Fira Code', monospace;}
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">EDUCATION CODING HUB</div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Ask AI Search..." id="ai-search">
+                        <span class="ai-tag">AI</span>
+                        <span class="ai-status-dot"></span>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="topic-layout">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <main class="main-content" id="full-content">
+            <div style="text-align:center; padding: 60px;">
+                <div style="animation: spin 1s linear infinite; display: inline-block; font-size: 3rem; margin-bottom: 20px;">⚙️</div>
+                <h2 style="color: #a5b4fc;">AI is writing a deeply insightful article about this topic...</h2>
+                <p>Please wait a moment while we fetch the best insights for you.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Coding Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Submit Idea Modal -->
+    <div id="idea-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-idea-modal">&times;</span>
+            <h2>Submit an Idea</h2>
+            <p>Have an idea for a new feature or course? Let us know!</p>
+            <form id="idea-form">
+                <input type="text" id="idea-name" placeholder="Your Name" required>
+                <input type="email" id="idea-email" placeholder="Your Email" required>
+                <textarea id="idea-desc" rows="4" placeholder="Describe your idea..." required></textarea>
+                <button type="submit" class="btn btn-primary" id="idea-submit-btn">Submit</button>
+            </form>
+            <div id="idea-response-msg" style="display: none; margin-top: 15px; font-weight: 500;"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=3"></script>
+    <script>
+        function onDOMReady(fn) {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener('DOMContentLoaded', fn);
+            }
+        }
+
+        onDOMReady(async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            const contentArea = document.getElementById('full-content');
+
+            if (!query) {
+                contentArea.innerHTML = '<h2 style="color:#f87171; text-align:center;">No search query specified.</h2>';
+                return;
+            }
+            
+            document.title = `AI Search: ${query} | EDUCATION CODING HUB`;
+
+            try {
+                // Fetch AI Answer and YouTube Video in parallel
+                const aiPromise = fetch(`${API_URL}/api/ask-ai`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: query })
+                }).then(res => res.json());
+
+                const ytPromise = fetch(`${API_URL}/api/youtube-search?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json());
+
+                const [aiData, ytData] = await Promise.allSettled([aiPromise, ytPromise]);
+
+                let aiHtml = '';
+                if (aiData.status === 'fulfilled' && !aiData.value.error) {
+                    aiHtml = formatMarkdownForAI(aiData.value.answer);
+                } else {
+                    console.error("AI Error:", aiData);
+                    aiHtml = '<div style="color: #f87171;">Could not fetch AI response at this time.</div>';
+                }
+
+                let ytHtml = '';
+                if (ytData.status === 'fulfilled' && ytData.value.videoId) {
+                    ytHtml = `
+                        <div style="margin-top: 40px;">
+                            <h2 style="color: white; border-left: 4px solid #f43f5e; padding-left: 15px; margin-bottom: 20px;">Related Video 🎥</h2>
+                            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/${ytData.value.videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                contentArea.innerHTML = `
+                    <h1 style="color: white; margin-bottom: 30px; font-size: 2.5rem; border-bottom: 4px solid #64f4ac; display: inline-block; padding-bottom: 10px;">✨ AI Results for: "${query}"</h1>
+                    <div class="detail-content" style="background: rgba(100, 244, 172, 0.05); border: 1px solid rgba(100, 244, 172, 0.2);">
+                        ${aiHtml}
+                        ${ytHtml}
+                    </div>
+
+                `;
+
+            } catch (error) {
+                contentArea.innerHTML = `<h2 style="color:#f87171; text-align: center;">Oops! Error loading content.</h2><p style="text-align:center; color:#cbd5e1;">${error.message}</p>`;
+                console.error(error);
+            }
+        });
+
+        // Robust Markdown Parser using Marked library
+        function formatMarkdownForAI(text) {
+            if (!text) return '';
+            try {
+                return marked.parse(text);
+            } catch (e) {
+                console.error("Marked parsing failed, falling back to basic text:", e);
+                return text;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -6,6 +6,8 @@
             "icon": "☕",
             "tag": "Java Masterclass",
             "tagClass": "oops",
+            "image": "./images/java_bg.png",
+            "date": "10-05-2026",
             "description": "The most comprehensive Java course ever. 20+ sections with nested sub-topics, deep dives, and GFG-level detail.",
             "topics": [
                 "Introduction to Java",
@@ -51,6 +53,8 @@
             "icon": "🐍",
             "tag": "Scripting",
             "tagClass": "script",
+            "image": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "date": "15-05-2026",
             "description": "Learn the syntax that powers AI. Simplicity, readability, and powerful standard libraries.",
             "topics": [
                 "Introduction to Python",
@@ -96,6 +100,8 @@
             "icon": "⌨️",
             "tag": "Foundation",
             "tagClass": "foundation",
+            "image": "./images/c_bg.png",
+            "date": "20-05-2026",
             "description": "The mother of all languages. Master memory management, pointers, and data structures.",
             "topics": [
                 "Introduction to C",
@@ -140,6 +146,8 @@
             "icon": "🧠",
             "tag": "Soft Skill",
             "tagClass": "foundation",
+            "image": "./images/logic_bg.png",
+            "date": "02-06-2026",
             "description": "Understand the art of reasoning. Learn how to break down complex problems into solvable steps.",
             "topics": [
                 "What is Logical Thinking?",
@@ -171,6 +179,8 @@
             "icon": "🚀",
             "tag": "Advanced OOP",
             "tagClass": "oops",
+            "image": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            "date": "12-06-2026",
             "description": "Master Object-Oriented Programming and high-performance applications with C++.",
             "topics": [
                 "Introduction to C++",

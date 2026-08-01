@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History of Computers | EDUCATION CODING HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .history-layout {
+            padding: 120px 40px 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: rgba(102, 126, 234, 0.5);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 4px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: #10b981;
+            border: 4px solid var(--bg-dark);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            left: 50%;
+        }
+
+        .left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid rgba(30, 41, 59, 0.9);
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent rgba(30, 41, 59, 0.9);
+        }
+
+        .right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid rgba(30, 41, 59, 0.9);
+            border-width: 10px 10px 10px 0;
+            border-color: transparent rgba(30, 41, 59, 0.9) transparent transparent;
+        }
+
+        .right::after {
+            left: -10px;
+        }
+
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: var(--bg-card);
+            position: relative;
+            border-radius: 12px;
+            border: var(--glass-border);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            border-color: rgba(100, 244, 172, 0.4);
+        }
+
+        .timeline-content h2 {
+            margin-top: 0;
+            color: var(--text-white);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-content .year {
+            font-weight: 700;
+            color: #a5b4fc;
+            margin-bottom: 15px;
+            display: inline-block;
+            font-size: 1.1rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Mobile responsive */
+        @media screen and (max-width: 600px) {
+            .timeline-container::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item::before {
+                left: 60px;
+                border: medium solid rgba(30, 41, 59, 0.9);
+                border-width: 10px 10px 10px 0;
+                border-color: transparent rgba(30, 41, 59, 0.9) transparent transparent;
+            }
+
+            .left::after, .right::after {
+                left: 21px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+        }
+        
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .hero-banner h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #667eea, #764ba2, #64f4ac);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">EDUCATION CODING HUB</div>
+            
+            <!-- Hamburger Menu for Mobile -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Home</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li>
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" placeholder="Ask AI Search..." id="ai-search">
+                        <span class="ai-tag">AI</span>
+                        <span class="ai-status-dot"></span>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="history-layout">
+        
+        <div class="hero-banner">
+            <h1>The History of Computing</h1>
+            <p style="color: var(--text-gray); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">From massive mechanical calculators to the intelligent programming languages of today.</p>
+        </div>
+
+        <div class="timeline-container">
+            
+            <div class="timeline-item left scroll-reveal">
+                <div class="timeline-content">
+                    <h2>The Abacus & Early Tools</h2>
+                    <span class="year">c. 2400 BC</span>
+                    <p>Long before electricity, humans invented the Abacus in ancient Mesopotamia. It is widely considered the first manual computing device, used to perform complex arithmetic calculations using sliding beads.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item right scroll-reveal">
+                <div class="timeline-content">
+                    <h2>The Analytical Engine</h2>
+                    <span class="year">1837</span>
+                    <p>Designed by Charles Babbage and documented by Ada Lovelace (the first programmer), this was the first concept for a general-purpose mechanical computer containing an ALU and basic flow control.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item left scroll-reveal">
+                <div class="timeline-content">
+                    <h2>ENIAC & Vacuum Tubes</h2>
+                    <span class="year">1945</span>
+                    <p>The Electronic Numerical Integrator and Computer was one of the earliest electronic general-purpose computers, taking up an entire room and programmed using physical cables and switches.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item right scroll-reveal">
+                <div class="timeline-content">
+                    <h2>Assembly & Fortran</h2>
+                    <span class="year">1950s</span>
+                    <p>Moving away from pure machine code (0s and 1s), Assembly language introduced human-readable mnemonics. Shortly after, IBM created FORTRAN, the first widely used high-level compiled language.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item left scroll-reveal">
+                <div class="timeline-content">
+                    <h2>C Language & UNIX</h2>
+                    <span class="year">1972</span>
+                    <p>Dennis Ritchie at Bell Labs created C, a powerful language that allowed close-to-the-metal performance with high-level abstractions. It was famously used to rewrite the UNIX operating system.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item left scroll-reveal">
+                <div class="timeline-content">
+                    <h2>The Personal Computer</h2>
+                    <span class="year">1980s</span>
+                    <p>Apple, IBM, and Microsoft brought computing to the masses. Object-Oriented Programming (OOP) became highly popular with the release of C++ (1983).</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item right scroll-reveal">
+                <div class="timeline-content">
+                    <h2>The Web & Java/Python</h2>
+                    <span class="year">1990s</span>
+                    <p>Tim Berners-Lee invented the World Wide Web. JavaScript was created in 10 days for web browsers. Java introduced "Write Once, Run Anywhere", and Python emerged focusing on code readability.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item left scroll-reveal">
+                <div class="timeline-content">
+                    <h2>Mobile & Cloud Computing</h2>
+                    <span class="year">2000s - 2010s</span>
+                    <p>The iPhone launch shifted focus to mobile development (Swift, Kotlin). Cloud computing (AWS) meant applications could run on massive distributed servers globally.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item right scroll-reveal">
+                <div class="timeline-content">
+                    <h2>AI & The Modern Era</h2>
+                    <span class="year">Present</span>
+                    <p>Today, AI models can write code themselves. Languages like Python dominate Data Science. Computing is ubiquitous, from smartwatches to massive AI data centers.</p>
+                </div>
+            </div>
+
+        </div>
+        
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; Coding Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Submit Idea Modal -->
+    <div id="idea-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close-idea-modal">&times;</span>
+            <h2>Submit an Idea</h2>
+            <p>Have an idea for a new feature or course? Let us know!</p>
+            <form id="idea-form">
+                <input type="text" id="idea-name" placeholder="Your Name" required>
+                <input type="email" id="idea-email" placeholder="Your Email" required>
+                <textarea id="idea-desc" rows="4" placeholder="Describe your idea..." required></textarea>
+                <button type="submit" class="btn btn-primary" id="idea-submit-btn">Submit</button>
+            </form>
+            <div id="idea-response-msg" style="display: none; margin-top: 15px; font-weight: 500;"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=3"></script>
+</body>
+</html>
