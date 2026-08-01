@@ -251,8 +251,7 @@ function renderCourses(courses) {
             <div class="course-card-content">
                 <h3>${course.name}</h3>
                 <p>${course.description}</p>
-                <div class="course-card-footer">
-                    <span class="course-date">${course.date || '12-06-2026'}</span>
+                <div class="course-card-footer" style="justify-content: flex-end;">
                     <button class="btn-read">Read</button>
                 </div>
             </div>
