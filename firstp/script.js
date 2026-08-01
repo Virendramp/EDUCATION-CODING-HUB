@@ -24,7 +24,7 @@ onDOMReady(() => {
     const themeToggleBtn = document.getElementById('theme-toggle');
     if (themeToggleBtn) {
         // Set initial icon
-        themeToggleBtn.textContent = document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+        themeToggleBtn.innerHTML = document.documentElement.getAttribute('data-theme') === 'light' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -38,7 +38,7 @@ onDOMReady(() => {
             localStorage.setItem('theme', newTheme);
             
             // Update icon
-            themeToggleBtn.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            themeToggleBtn.innerHTML = newTheme === 'light' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         });
     }
 });
@@ -271,7 +271,7 @@ function renderCourses(courses) {
     requestCard.className = 'course-card request-card scroll-reveal';
     requestCard.style.animationDelay = `${courses.length * 0.15}s`;
     requestCard.innerHTML = `
-        <div class="course-icon">➕</div>
+        <div class="course-icon"><i class="fas fa-plus"></i></div>
         <h3>Request a Track</h3>
         <p>Don't see your technology? Tell us what you want to learn next.</p>
         <button class="btn-submit">Submit Idea</button>

@@ -769,7 +769,9 @@ ul {
 }
 
 .no-results::before {
-    content: '🔍';
+    content: '\f002';
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
     font-size: 3rem;
     margin-bottom: 15px;
     opacity: 0.5;
