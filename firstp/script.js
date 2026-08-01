@@ -366,7 +366,7 @@ function initAISearch() {
             autoAIHint.style.background = 'rgba(100, 244, 172, 0.1)';
             autoAIHint.style.padding = '12px 15px';
             autoAIHint.innerHTML = `
-                <span class="result-icon">✨</span>
+                <span class="result-icon"><i class="fas fa-wand-magic-sparkles" style="color: #64f4ac;"></i></span>
                 <div class="result-info" style="display:flex; flex-direction:column;">
                     <span class="result-name" style="color:#64f4ac; font-weight:600; font-size:0.9rem;">No courses found for "${query}"</span>
                     <span class="result-desc" style="font-size:0.75rem; color:#94a3b8;">Asking AI automatically...</span>
@@ -404,7 +404,7 @@ function initAISearch() {
         enterHint.style.padding = '12px 15px';
         enterHint.style.cursor = 'pointer';
         enterHint.innerHTML = `
-            <span class="result-icon">✨</span>
+            <span class="result-icon"><i class="fas fa-wand-magic-sparkles" style="color: #64f4ac;"></i></span>
             <div class="result-info" style="display:flex; flex-direction:column;">
                 <span class="result-name" style="color:#64f4ac; font-weight:600; font-size:0.9rem;">Ask AI about "${currentQuery}"</span>
                 <span class="result-desc" style="font-size:0.75rem; color:#94a3b8;">Press <strong>Enter</strong> or click here</span>
