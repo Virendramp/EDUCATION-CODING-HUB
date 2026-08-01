@@ -740,10 +740,7 @@ function initParticles() {
 }
 
 onDOMReady(() => {
-    // Only initialize the particle background on the home page to avoid distracting from reading pages
-    if (document.getElementById('home') && document.querySelector('.hero')) {
-        initParticles();
-    }
+    initParticles();
 
     // Hamburger Menu Logic
     const hamburger = document.querySelector('.hamburger');

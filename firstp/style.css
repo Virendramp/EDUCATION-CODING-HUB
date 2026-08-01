@@ -6,6 +6,7 @@
     --secondary-gradient: linear-gradient(135deg, #64f4ac 0%, #3bb2b8 100%);
     --bg-dark: #0f172a;
     --bg-card: rgba(30, 41, 59, 0.7);
+    --bg-solid-card: #1e293b;
     --text-white: #f8fafc;
     --text-gray: #94a3b8;
     --glass-border: 1px solid rgba(255, 255, 255, 0.08);
@@ -18,6 +19,7 @@
 [data-theme="light"] {
     --bg-dark: #f8fafc;
     --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-solid-card: #ffffff;
     --text-white: #0f172a;
     --text-gray: #475569;
     --glass-border: 1px solid rgba(0, 0, 0, 0.1);
