@@ -13,11 +13,11 @@ function onDOMReady(fn) {
 }
 
 // Theme Initialization
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-} else {
+const savedTheme = localStorage.getItem('theme') || 'dark';
+if (savedTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
 }
 
 onDOMReady(() => {
