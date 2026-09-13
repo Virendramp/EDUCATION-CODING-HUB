@@ -34,17 +34,21 @@
             padding: 25px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--primary-color) transparent;
+            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
             will-change: transform;
         }
 
         .sidebar::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.15);
             border-radius: 10px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(102, 126, 234, 0.5);
         }
 
         .sidebar-title {
@@ -376,7 +380,11 @@
             document.getElementById('course-content').style.display = 'block';
 
             document.title = `${course.name} | EDUCATION CODING HUB`;
-            document.getElementById('course-icon').textContent = course.icon;
+            if (course.icon && course.icon.trim().startsWith('<')) {
+                document.getElementById('course-icon').innerHTML = course.icon;
+            } else {
+                document.getElementById('course-icon').innerHTML = course.icon || '';
+            }
             document.getElementById('course-name').textContent = course.name;
             document.getElementById('course-description').textContent = course.description;
 
