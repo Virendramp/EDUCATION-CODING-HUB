@@ -241,15 +241,18 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">EDUCATION CODING HUB</div>
-            <div class="hamburger">
+            <a href="index.html" class="logo">EDUCATION CODING HUB</a>
+            <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
-                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Courses</a></li>
+                <li><a href="javascript:void(0)" class="nav-link open-custom-course-btn"><i class="fas fa-wand-magic-sparkles" style="color: #64f4ac; margin-right: 4px;"></i> Prepare AI Course</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="ai-search.html" class="nav-link">AI Tutor</a></li>
                 <li>
                     <div class="search-container">
                         <span class="search-icon"><i class="fas fa-search"></i></span>
@@ -324,6 +327,7 @@
     <script src="script.js?v=3"></script>
     <script>
         // API_URL is already defined in script.js?v=3
+        let currentCourse = null;
 
         function onDOMReady(fn) {
             if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -351,16 +355,26 @@
                     if (!response.ok) throw new Error('Course not found on backend');
                     course = await response.json();
                 } catch (backendError) {
-                    console.warn('Backend fetch failed, falling back to local courses.json:', backendError.message);
-                    // Fallback to local courses.json
-                    const localRes = await fetch('./courses.json');
-                    if (!localRes.ok) throw new Error('Could not load local courses.json');
-                    
-                    const localData = await localRes.json();
-                    const coursesList = Array.isArray(localData) ? localData : localData.courses;
-                    course = coursesList.find(c => c.id == courseId);
-                    
-                    if (!course) throw new Error('Course not found locally either');
+                    console.warn('Backend fetch failed, checking localStorage & local courses.json:', backendError.message);
+                    const savedCustom = localStorage.getItem(`custom_course_${courseId}`);
+                    if (savedCustom) {
+                        try {
+                            course = JSON.parse(savedCustom);
+                        } catch (e) {
+                            console.error("Error parsing saved custom course:", e);
+                        }
+                    }
+                    if (!course) {
+                        // Fallback to local courses.json
+                        const localRes = await fetch('./courses.json');
+                        if (!localRes.ok) throw new Error('Could not load local courses.json');
+                        
+                        const localData = await localRes.json();
+                        const coursesList = Array.isArray(localData) ? localData : localData.courses;
+                        course = coursesList.find(c => c.id == courseId);
+                        
+                        if (!course) throw new Error('Course not found locally either');
+                    }
                 }
 
                 renderCourse(course);
@@ -376,6 +390,7 @@
         });
 
         function renderCourse(course) {
+            currentCourse = course;
             document.getElementById('loading').style.display = 'none';
             document.getElementById('course-content').style.display = 'block';
 
@@ -445,116 +460,153 @@
             }
         }
 
+        let activeTopicRequestId = 0;
+
+        async function loadWikipediaFallback(topicName, container, reqId) {
+            if (!container || reqId !== activeTopicRequestId) return;
+            try {
+                const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
+                if (reqId !== activeTopicRequestId) return;
+                if (wikiRes.ok) {
+                    const wikiData = await wikiRes.json();
+                    if (wikiData.extract_html) {
+                        container.innerHTML = `<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 12px 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.9rem;"><strong>Overview Note:</strong> Showing foundational knowledge. Please watch the full video tutorial below.</div>` + wikiData.extract_html;
+                        return;
+                    }
+                }
+                container.innerHTML = `<h3>${topicName}</h3><p>Welcome to this lesson on <strong>${topicName}</strong>. Watch the comprehensive video tutorial below to master this concept with code demonstrations.</p>`;
+            } catch (e) {
+                container.innerHTML = `<h3>${topicName}</h3><p>Follow along with the video tutorial below for hands-on practice with ${topicName}.</p>`;
+            }
+        }
+
         async function loadTopicContent(topicName) {
             const contentArea = document.getElementById('full-content');
+            const requestId = ++activeTopicRequestId;
 
-            // Show loading state
-            contentArea.innerHTML = `
-                <div style="text-align:center; padding: 60px;">
-                    <div style="animation: spin 1s linear infinite; display: inline-block; font-size: 3rem; margin-bottom: 20px;">⚙️</div>
-                    <h2 style="color: #a5b4fc;">Loading content for "${topicName}"...</h2>
-                </div>
-            `;
+            const courseName = (currentCourse && currentCourse.name ? currentCourse.name : '');
+            let fallbackVideoId = 'eIrMbAQSU34';
+            const cName = courseName.toLowerCase();
+            if (cName.includes('python')) fallbackVideoId = '_uQrJ0TkZlc';
+            else if (cName.includes('c++')) fallbackVideoId = 'vLnPwxZdW4Y';
+            else if (cName.includes('c language') || cName === 'c') fallbackVideoId = 'irqbmMNs2Bo';
+            else if (cName.includes('logical')) fallbackVideoId = '2SBD3zKK3QI';
 
-            // Ensure animation exist via inject
-            if (!document.getElementById('spin-keyframes')) {
-                const style = document.createElement('style');
-                style.id = 'spin-keyframes';
-                style.innerHTML = '@keyframes spin { 100% { transform: rotate(360deg); } }';
-                document.head.appendChild(style);
-            }
+            const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(topicName + ' ' + courseName + ' tutorial programming')}`;
 
-            try {
-                let finalHtml = '';
-                let gptSuccess = false;
+            // Check browser cache first for instant sub-millisecond render
+            const localCacheKey = 'cached_topic_' + topicName.trim().toLowerCase();
+            const locallyCached = localStorage.getItem(localCacheKey);
+            let initialContentHtml = '';
 
-                // 1. Try Fetching from Backend ChatGPT Endpoint
-                try {
-                    const aiRes = await fetch(`${API_URL}/api/generate-content`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ topic: typeof topicName === 'string' ? topicName : topicName.toString() })
-                    });
-
-                    const data = await aiRes.json();
-                    if (aiRes.ok && data.content) {
-                        finalHtml = formatMarkdownForAI(data.content);
-                        gptSuccess = true;
-                    } else {
-                        console.warn("ChatGPT Failed:", data.error);
-                    }
-                } catch (e) {
-                    console.error("Backend AI API fetch error", e);
-                }
-
-                // 2. Fallback to Free Wikipedia API if ChatGPT fails
-                if (!gptSuccess) {
-                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> We are unable to generate detailed AI content at this moment. Showing basic information instead.</div>';
-                    try {
-                        const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
-                        if (wikiRes.ok) {
-                            const wikiData = await wikiRes.json();
-                            if (wikiData.extract_html) finalHtml += wikiData.extract_html;
-                        } else {
-                            // Search alternative
-                            const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(topicName)}&utf8=&format=json&origin=*`);
-                            const searchData = await searchRes.json();
-                            if (searchData.query.search.length > 0) {
-                                const wikiRes2 = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchData.query.search[0].title)}`);
-                                const wikiData2 = await wikiRes2.json();
-                                if (wikiData2.extract_html) finalHtml += wikiData2.extract_html;
-                            }
-                        }
-                    } catch (e) {
-                        finalHtml += '<p style="color:#f87171">Error connecting to fallback API.</p>';
-                    }
-                }
-
-                // YouTube Embed
-                let videoIframe = '<p style="color: #94a3b8; text-align: center; padding: 40px;">Searching for video tutorial...</p>';
-                try {
-                    const ytRes = await fetch(`${API_URL}/api/youtube-search?q=${encodeURIComponent(topicName + ' tutorial programming hindi')}`);
-                    if (ytRes.ok) {
-                        const ytData = await ytRes.json();
-                        videoIframe = `
-                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
-                                src="https://www.youtube.com/embed/${ytData.videoId}" 
-                                allowfullscreen>
-                            </iframe>
-                        `;
-                    } else {
-                        videoIframe = '<p style="color: #f87171; text-align: center; padding: 40px;">Video tutorial currently unavailable.</p>';
-                    }
-                } catch (e) {
-                    console.error("YouTube search error", e);
-                    videoIframe = '<p style="color: #f87171; text-align: center; padding: 40px;">Video search failed to load.</p>';
-                }
-
-                const youtubeEmbed = `
-                    <div style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
-                        <h2 style="color: white; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                            <span style="color: red;">▶</span> Watch Video Tutorial
-                        </h2>
-                        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(0,0,0,0.2);">
-                            ${videoIframe}
+            if (locallyCached) {
+                initialContentHtml = formatMarkdownForAI(locallyCached);
+            } else {
+                initialContentHtml = `
+                    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px 28px; margin-bottom: 25px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                            <h3 style="margin: 0; color: #64f4ac; font-size: 1.35rem; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-book-open"></i> Lesson: ${topicName}
+                            </h3>
+                            <span id="topic-notes-status" style="font-size: 0.8rem; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-circle-notch fa-spin"></i> Polishing in-depth notes...
+                            </span>
+                        </div>
+                        <p style="color: #cbd5e1; line-height: 1.7; font-size: 1.05rem; margin-bottom: 16px;">
+                            Welcome to the lesson on <strong>${topicName}</strong> in <strong>${courseName}</strong>. This guide walks you through the core concepts, standard conventions, and practical implementation patterns.
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px;">
+                            <div style="background: rgba(255,255,255,0.04); border-left: 3px solid #667eea; padding: 10px 14px; border-radius: 6px;">
+                                <div style="color: #a5b4fc; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">🎯 OBJECTIVE</div>
+                                <div style="color: #e2e8f0; font-size: 0.9rem;">Master syntax & practical implementation of ${topicName}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.04); border-left: 3px solid #64f4ac; padding: 10px 14px; border-radius: 6px;">
+                                <div style="color: #64f4ac; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">💡 PRO TIP</div>
+                                <div style="color: #e2e8f0; font-size: 0.9rem;">Follow along with code examples in your local IDE or terminal</div>
+                            </div>
                         </div>
                     </div>
                 `;
+            }
 
-                contentArea.innerHTML = `
-                    <h1 style="color: white; margin-bottom: 30px; font-size: 2.8rem; border-bottom: 4px solid #667eea; display: inline-block; padding-bottom: 10px;">${topicName}</h1>
-                    <div class="detail-content">
-                        ${finalHtml}
+            // 1. Instantly render the layout with video player and written notes
+            contentArea.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+                    <h1 style="color: white; margin: 0; font-size: 2.6rem; border-bottom: 4px solid #667eea; padding-bottom: 8px;">${topicName}</h1>
+                    <a href="${ytSearchUrl}" target="_blank" rel="noopener noreferrer" 
+                       style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; text-decoration: none;">
+                        <i class="fab fa-youtube" style="color: #ef4444;"></i> Search on YouTube
+                    </a>
+                </div>
+
+                <div class="detail-content" id="topic-detail-text">
+                    ${initialContentHtml}
+                </div>
+
+                <div style="margin-top: 45px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 35px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                        <h2 style="color: white; margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.5rem;">
+                            <span style="color: #ef4444;"><i class="fab fa-youtube"></i></span> Video Tutorial
+                        </h2>
+                        <span id="topic-video-badge" style="font-size: 0.85rem; color: #94a3b8;"><i class="fas fa-play-circle" style="color: #64f4ac;"></i> Ready to watch</span>
                     </div>
-                    ${youtubeEmbed}
-                `;
+                    <div id="topic-video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); background: #000; border: 1px solid rgba(255,255,255,0.08);">
+                        <iframe id="topic-video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
+                            src="https://www.youtube.com/embed/${fallbackVideoId}" 
+                            title="${topicName} Tutorial"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            `;
 
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            } catch (error) {
-                contentArea.innerHTML = `<h2 style="color:#f87171; text-align: center;">Oops! Error loading content.</h2>`;
-                console.error(error);
+            // 2. Fetch YouTube search in parallel to upgrade to exact video ID
+            fetch(`${API_URL}/api/youtube-search?q=${encodeURIComponent(topicName + ' ' + courseName + ' tutorial')}`)
+                .then(res => res.json())
+                .then(ytData => {
+                    if (requestId !== activeTopicRequestId) return;
+                    if (ytData && ytData.videoId) {
+                        const iframe = document.getElementById('topic-video-iframe');
+                        if (iframe && iframe.src.indexOf(ytData.videoId) === -1) {
+                            iframe.src = `https://www.youtube.com/embed/${ytData.videoId}`;
+                            if (ytData.title) iframe.title = ytData.title;
+                        }
+                    }
+                })
+                .catch(err => console.warn('YouTube search fallback in use:', err));
+
+            // 3. Fetch AI / pre-cached content in parallel
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+                const aiRes = await fetch(`${API_URL}/api/generate-content`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: String(topicName) }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (requestId !== activeTopicRequestId) return;
+
+                const data = await aiRes.json();
+                const textContainer = document.getElementById('topic-detail-text');
+                if (textContainer && aiRes.ok && data.content) {
+                    localStorage.setItem(localCacheKey, data.content);
+                    textContainer.innerHTML = formatMarkdownForAI(data.content);
+                } else if (!locallyCached) {
+                    loadWikipediaFallback(topicName, textContainer, requestId);
+                }
+            } catch (aiErr) {
+                if (requestId !== activeTopicRequestId) return;
+                const textContainer = document.getElementById('topic-detail-text');
+                if (textContainer && !locallyCached) {
+                    loadWikipediaFallback(topicName, textContainer, requestId);
+                }
             }
         }
 
@@ -569,6 +621,25 @@
             }
         }
     </script>
+    <!-- Prepare AI Course Modal -->
+    <div id="custom-course-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-btn close-custom-course-modal">&times;</span>
+            <div style="font-size: 3rem; color: #64f4ac; margin-bottom: 10px;"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h2 style="margin-bottom: 10px;">Prepare Custom AI Course</h2>
+            <p style="color: var(--text-gray); margin-bottom: 20px; font-size: 0.95rem;">Tell us what topic or technology you want to learn (e.g. <b>AI & Machine Learning, Cybersecurity, Rust, Data Science...</b>). Our AI tutor will instantly create your structured course!</p>
+            <form id="custom-course-form">
+                <input type="text" id="custom-course-input" placeholder="e.g. AI and Machine Learning" required style="width:100%; padding: 14px 18px; margin-bottom: 15px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 1rem; outline: none;">
+                <button type="submit" class="btn btn-primary" id="custom-course-submit-btn" style="width: 100%; padding: 14px; font-size: 1rem; background: linear-gradient(135deg, #10b981, #6366f1); border: none;">
+                    <i class="fas fa-bolt" style="margin-right: 6px;"></i> Prepare My Course
+                </button>
+            </form>
+            <div id="custom-course-status" style="display: none; margin-top: 20px;">
+                <div style="font-size: 2.2rem; color: #a5b4fc; margin-bottom: 10px;"><i class="fas fa-spinner fa-spin"></i></div>
+                <p id="custom-course-status-text" style="color: #a5b4fc; font-weight: 500;">AI is crafting your course curriculum...</p>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

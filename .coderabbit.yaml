@@ -1,0 +1,20 @@
+# CodeRabbit AI Code Reviewer Configuration
+# Official Documentation: https://docs.coderabbit.ai/getting-started/configure-coderabbit/
+
+version: "2"
+language: "en-US"
+tone_instructions: "Provide concise, actionable, and constructive code review feedback with code examples."
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!node_modules/**"
+    - "!package-lock.json"
+
+chat:
+  auto_reply: true

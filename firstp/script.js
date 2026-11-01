@@ -12,6 +12,50 @@ function onDOMReady(fn) {
     }
 }
 
+// Give same-site page navigation a short directional transition.
+let pageNavigationStarted = false;
+function navigateWithTransition(destination) {
+    const nextUrl = new URL(destination, window.location.href);
+    if (nextUrl.origin !== window.location.origin || nextUrl.href === window.location.href) {
+        window.location.href = nextUrl.href;
+        return;
+    }
+    if (pageNavigationStarted) return;
+    pageNavigationStarted = true;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion || !document.body) {
+        window.location.href = nextUrl.href;
+        return;
+    }
+    sessionStorage.setItem('page-transition-destination', `${nextUrl.pathname}${nextUrl.search}`);
+    document.body.classList.remove('page-entering');
+    document.body.classList.add('page-exiting');
+    window.setTimeout(() => { window.location.href = nextUrl.href; }, 260);
+}
+
+function initPageTransitions() {
+    const destination = sessionStorage.getItem('page-transition-destination');
+    const currentPage = `${window.location.pathname}${window.location.search}`;
+    if (destination === currentPage && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.body.classList.add('page-entering');
+        window.setTimeout(() => document.body.classList.remove('page-entering'), 500);
+    }
+    sessionStorage.removeItem('page-transition-destination');
+
+    document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = event.target.closest('a[href]');
+        if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+        const nextUrl = new URL(link.href, window.location.href);
+        if (nextUrl.origin !== window.location.origin || nextUrl.protocol === 'javascript:') return;
+        if (nextUrl.pathname === window.location.pathname && nextUrl.search === window.location.search) return;
+        event.preventDefault();
+        navigateWithTransition(nextUrl.href);
+    });
+}
+
+onDOMReady(initPageTransitions);
+
 // Theme Initialization
 const savedTheme = localStorage.getItem('theme') || 'dark';
 if (savedTheme === 'light') {
@@ -39,6 +83,24 @@ onDOMReady(() => {
             
             // Update icon
             themeToggleBtn.innerHTML = newTheme === 'light' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+        });
+    }
+
+    // Mobile Hamburger Menu Toggle
+    const hamburger = document.getElementById('hamburger') || document.querySelector('.hamburger');
+    const navMenu = document.getElementById('nav-menu') || document.querySelector('.nav-menu');
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
         });
     }
 });
@@ -94,8 +156,8 @@ function typeWriter() {
     setTimeout(typeWriter, typingSpeed);
 }
 
-// Start the typewriter effect
-typeWriter();
+// Keep the typewriter effect only on pages that still provide its target.
+if (animatedText) typeWriter();
 
 // Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -249,11 +311,10 @@ function renderCourses(courses) {
         courseCard.innerHTML = `
             <div class="course-card-bg" style="background-image: url('${bgImg}');"></div>
             <div class="course-card-content">
-                <h3>${course.name}</h3>
-                <p>${course.description}</p>
-                <div class="course-card-footer" style="justify-content: flex-end;">
-                    <button class="btn-read">Read</button>
-                </div>
+                <div class="course-card-top"><span class="course-label">LEARNING PATH</span><span class="course-card-icon">${course.icon || '<i class="fas fa-code"></i>'}</span></div>
+                <div class="course-card-copy"><span class="course-tag">${course.tag || 'Start learning'}</span><h3>${course.name}</h3>
+                <p>${course.description}</p></div>
+                <div class="course-card-footer"><span class="course-open-label">Explore course</span><button class="btn-read" aria-label="Explore ${course.name}"><i class="fas fa-arrow-right"></i></button></div>
             </div>
         `;
 
@@ -294,7 +355,7 @@ function attachCourseEventListeners() {
             const courseId = this.dataset.courseId;
             console.log('Clicked course:', courseId);
             // Redirect to new page instead of modal
-            window.location.href = `course.html?id=${courseId}`;
+            navigateWithTransition(`course.html?id=${courseId}`);
         });
     });
 
@@ -325,7 +386,7 @@ function initAISearch() {
     let debounceTimer;
 
     const askAI = (query) => {
-        window.location.href = `ai-search.html?q=${encodeURIComponent(query)}`;
+        navigateWithTransition(`ai-search.html?q=${encodeURIComponent(query)}`);
     };
 
     searchInput.addEventListener('keydown', (e) => {
@@ -430,7 +491,7 @@ function initAISearch() {
                     </div>
                 `;
                 item.addEventListener('click', () => {
-                    window.location.href = `course.html?id=${course.id}`;
+                    navigateWithTransition(`course.html?id=${course.id}`);
                 });
                 resultsPanel.appendChild(item);
             });
@@ -483,6 +544,23 @@ const observer = new IntersectionObserver(function (entries) {
 document.querySelectorAll('.scroll-reveal').forEach(el => {
     observer.observe(el);
 });
+
+// Replay each home-page panel's reveal every time it enters the viewport.
+const pagePanels = document.querySelectorAll('.home-page .scroll-panel');
+if ('IntersectionObserver' in window) {
+    const pagePanelObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            } else {
+                entry.target.classList.remove('is-visible');
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+    pagePanels.forEach(panel => pagePanelObserver.observe(panel));
+} else {
+    pagePanels.forEach(panel => panel.classList.add('is-visible'));
+}
 
 // Animations are now handled in CSS (.fade-in-up class)
 
@@ -742,6 +820,65 @@ function initParticles() {
 onDOMReady(() => {
     initParticles();
 
+    // Hero preview carousel: auto-advance, with dot and swipe controls.
+    const preview = document.querySelector('.code-window');
+    if (preview) {
+        const track = preview.querySelector('.code-track');
+        const slides = Array.from(preview.querySelectorAll('.code-slide'));
+        const dots = Array.from(preview.querySelectorAll('.code-dot'));
+        const fileName = preview.querySelector('.window-file');
+        const slideCount = preview.querySelector('.code-slide-count');
+        const names = ['your-next-idea.py', 'make-it-real.js', 'your-learning-path.ai'];
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let activeSlide = 0;
+        let carouselTimer;
+        let touchStartX = null;
+
+        const showSlide = (index) => {
+            activeSlide = (index + slides.length) % slides.length;
+            track.style.transform = `translateX(-${activeSlide * 100}%)`;
+            dots.forEach((dot, dotIndex) => {
+                const isActive = dotIndex === activeSlide;
+                dot.classList.toggle('is-active', isActive);
+                dot.setAttribute('aria-pressed', String(isActive));
+            });
+            if (fileName) fileName.textContent = names[activeSlide];
+            if (slideCount) slideCount.innerHTML = `0${activeSlide + 1} <i>/</i> 0${slides.length}`;
+            slides.forEach((slide, slideIndex) => {
+                slide.setAttribute('aria-hidden', String(slideIndex !== activeSlide));
+            });
+        };
+
+        const stopCarousel = () => window.clearInterval(carouselTimer);
+        const startCarousel = () => {
+            stopCarousel();
+            if (!reducedMotion && !document.hidden) {
+                carouselTimer = window.setInterval(() => showSlide(activeSlide + 1), 5000);
+            }
+        };
+
+        dots.forEach((dot, index) => dot.addEventListener('click', () => {
+            showSlide(index);
+            startCarousel();
+        }));
+        // Keep the preview moving automatically; manual controls remain available.
+        preview.addEventListener('touchstart', (event) => {
+            touchStartX = event.changedTouches[0].clientX;
+            stopCarousel();
+        }, { passive: true });
+        preview.addEventListener('touchend', (event) => {
+            if (touchStartX !== null) {
+                const swipeDistance = event.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(swipeDistance) > 45) showSlide(activeSlide + (swipeDistance < 0 ? 1 : -1));
+            }
+            touchStartX = null;
+            startCarousel();
+        }, { passive: true });
+        document.addEventListener('visibilitychange', startCarousel);
+        showSlide(0);
+        startCarousel();
+    }
+
     // Hamburger Menu Logic
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -758,6 +895,79 @@ onDOMReady(() => {
                 navMenu.classList.remove('active');
                 hamburger.classList.remove('active');
             });
+        });
+    }
+
+    // Prepare Custom AI Course Modal Handler
+    const customModal = document.getElementById('custom-course-modal');
+    const closeBtn = document.querySelector('.close-custom-course-modal');
+    const form = document.getElementById('custom-course-form');
+    const input = document.getElementById('custom-course-input');
+    const statusBox = document.getElementById('custom-course-status');
+    const statusText = document.getElementById('custom-course-status-text');
+    const submitBtn = document.getElementById('custom-course-submit-btn');
+
+    document.querySelectorAll('.open-custom-course-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (customModal) {
+                customModal.style.display = 'block';
+                if (input) input.focus();
+            }
+        });
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            if (customModal) customModal.style.display = 'none';
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === customModal) {
+            customModal.style.display = 'none';
+        }
+    });
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const topicPrompt = input.value.trim();
+            if (!topicPrompt) return;
+
+            const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            const safePrompt = escapeHtml(topicPrompt);
+
+            if (statusBox) statusBox.style.display = 'block';
+            if (statusText) statusText.innerHTML = `<i class="fas fa-robot fa-spin" style="margin-right: 8px;"></i> AI is designing your curriculum for "${safePrompt}"...`;
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/generate-course`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: topicPrompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server status ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.course && data.course.id) {
+                    localStorage.setItem(`custom_course_${data.course.id}`, JSON.stringify(data.course));
+                    if (statusText) statusText.innerHTML = `✨ Course created successfully! Redirecting...`;
+                    setTimeout(() => {
+                        navigateWithTransition(`course.html?id=${data.course.id}`);
+                    }, 500);
+                } else {
+                    throw new Error('Invalid course format returned');
+                }
+            } catch (err) {
+                console.error('Course generation failed:', err);
+                if (statusText) statusText.innerHTML = `<span style="color: #f87171;">⚠️ Failed to generate course. Please try again.</span>`;
+                if (submitBtn) submitBtn.disabled = false;
+            }
         });
     }
 });

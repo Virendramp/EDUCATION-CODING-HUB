@@ -182,7 +182,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">EDUCATION CODING HUB</div>
+            <a href="index.html" class="logo">EDUCATION CODING HUB</a>
             
             <!-- Hamburger Menu for Mobile -->
             <div class="hamburger" id="hamburger">
@@ -193,8 +193,10 @@
             
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
-                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
-                <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Courses</a></li>
+                <li><a href="javascript:void(0)" class="nav-link open-custom-course-btn"><i class="fas fa-wand-magic-sparkles" style="color: #64f4ac; margin-right: 4px;"></i> Prepare AI Course</a></li>
+                <li><a href="history.html" class="nav-link active">History</a></li>
+                <li><a href="ai-search.html" class="nav-link">AI Tutor</a></li>
                 <li>
                     <div class="search-container">
                         <span class="search-icon"><i class="fas fa-search"></i></span>
@@ -318,5 +320,24 @@
     </div>
 
     <script src="script.js?v=3"></script>
+    <!-- Prepare AI Course Modal -->
+    <div id="custom-course-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-btn close-custom-course-modal">&times;</span>
+            <div style="font-size: 3rem; color: #64f4ac; margin-bottom: 10px;"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h2 style="margin-bottom: 10px;">Prepare Custom AI Course</h2>
+            <p style="color: var(--text-gray); margin-bottom: 20px; font-size: 0.95rem;">Tell us what topic or technology you want to learn (e.g. <b>AI & Machine Learning, Cybersecurity, Rust, Data Science...</b>). Our AI tutor will instantly create your structured course!</p>
+            <form id="custom-course-form">
+                <input type="text" id="custom-course-input" placeholder="e.g. AI and Machine Learning" required style="width:100%; padding: 14px 18px; margin-bottom: 15px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 1rem; outline: none;">
+                <button type="submit" class="btn btn-primary" id="custom-course-submit-btn" style="width: 100%; padding: 14px; font-size: 1rem; background: linear-gradient(135deg, #10b981, #6366f1); border: none;">
+                    <i class="fas fa-bolt" style="margin-right: 6px;"></i> Prepare My Course
+                </button>
+            </form>
+            <div id="custom-course-status" style="display: none; margin-top: 20px;">
+                <div style="font-size: 2.2rem; color: #a5b4fc; margin-bottom: 10px;"><i class="fas fa-spinner fa-spin"></i></div>
+                <p id="custom-course-status-text" style="color: #a5b4fc; font-weight: 500;">AI is crafting your course curriculum...</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

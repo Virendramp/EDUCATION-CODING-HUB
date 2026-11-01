@@ -74,16 +74,18 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">EDUCATION CODING HUB</div>
-            <div class="hamburger">
+            <a href="index.html" class="logo">EDUCATION CODING HUB</a>
+            <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <ul class="nav-menu">
+            <ul class="nav-menu" id="nav-menu">
                 <li><a href="index.html#home" class="nav-link">Home</a></li>
-                <li><a href="index.html#clubs" class="nav-link">Clubs</a></li>
+                <li><a href="index.html#clubs" class="nav-link">Courses</a></li>
+                <li><a href="javascript:void(0)" class="nav-link open-custom-course-btn"><i class="fas fa-wand-magic-sparkles" style="color: #64f4ac; margin-right: 4px;"></i> Prepare AI Course</a></li>
                 <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="ai-search.html" class="nav-link">AI Tutor</a></li>
                 <li>
                     <div class="search-container">
                         <span class="search-icon"><i class="fas fa-search"></i></span>
@@ -230,6 +232,8 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
             document.title = `${topicName} | EDUCATION CODING HUB`;
 
             const staticKey = topicName.toLowerCase().trim();
+            const youtubeHtml = await getYouTubeEmbedHtml(topicName);
+
             if (STATIC_ARTICLES[staticKey]) {
                 const finalHtml = formatMarkdownForAI(STATIC_ARTICLES[staticKey]);
                 contentArea.innerHTML = `
@@ -237,7 +241,7 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                     <div class="detail-content">
                         ${finalHtml}
                     </div>
-
+                    ${youtubeHtml}
                 `;
                 return;
             }
@@ -257,7 +261,7 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                 } else {
                     console.warn("ChatGPT Failed:", data.error);
                     // Fallback to Wikipedia
-                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> AI Server overloaded. Showing fallback content.</div>';
+                    finalHtml = '<div style="background: rgba(234, 179, 8, 0.1); border-left: 4px solid #eab308; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #fde047; font-size: 0.95rem;"><strong>Note:</strong> Showing overview information.</div>';
                     const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topicName)}`);
                     if (wikiRes.ok) {
                         const wikiData = await wikiRes.json();
@@ -270,7 +274,7 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                     <div class="detail-content">
                         ${finalHtml}
                     </div>
-
+                    ${youtubeHtml}
                 `;
 
             } catch (error) {
@@ -278,6 +282,51 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
                 console.error(error);
             }
         });
+
+        async function getYouTubeEmbedHtml(topicName) {
+            let videoId = null;
+            let videoTitle = `${topicName} Tutorial`;
+            try {
+                const ytRes = await fetch(`${API_URL}/api/youtube-search?q=${encodeURIComponent(topicName + ' programming tutorial')}`);
+                if (ytRes.ok) {
+                    const ytData = await ytRes.json();
+                    if (ytData && ytData.videoId) {
+                        videoId = ytData.videoId;
+                        if (ytData.title) videoTitle = ytData.title;
+                    }
+                }
+            } catch (e) {
+                console.warn("YouTube search error:", e);
+            }
+
+            if (!videoId) {
+                videoId = '2SBD3zKK3QI'; // default tutorial
+            }
+
+            const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(topicName + ' tutorial programming')}`;
+
+            return `
+                <div style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 35px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                        <h2 style="color: white; margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.5rem;">
+                            <span style="color: #ef4444;"><i class="fab fa-youtube"></i></span> Video Tutorial
+                        </h2>
+                        <a href="${ytSearchUrl}" target="_blank" rel="noopener noreferrer" 
+                           style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; text-decoration: none;">
+                            <i class="fas fa-arrow-up-right-from-square"></i> Open in YouTube
+                        </a>
+                    </div>
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); background: #000; border: 1px solid rgba(255,255,255,0.08);">
+                        <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" 
+                            src="https://www.youtube.com/embed/${videoId}" 
+                            title="${videoTitle}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            `;
+        }
 
         // Robust Markdown Parser using Marked library
         function formatMarkdownForAI(text) {
@@ -290,6 +339,25 @@ As we move towards a future dominated by Artificial Intelligence, Quantum Comput
             }
         }
     </script>
+    <!-- Prepare AI Course Modal -->
+    <div id="custom-course-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-btn close-custom-course-modal">&times;</span>
+            <div style="font-size: 3rem; color: #64f4ac; margin-bottom: 10px;"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h2 style="margin-bottom: 10px;">Prepare Custom AI Course</h2>
+            <p style="color: var(--text-gray); margin-bottom: 20px; font-size: 0.95rem;">Tell us what topic or technology you want to learn (e.g. <b>AI & Machine Learning, Cybersecurity, Rust, Data Science...</b>). Our AI tutor will instantly create your structured course!</p>
+            <form id="custom-course-form">
+                <input type="text" id="custom-course-input" placeholder="e.g. AI and Machine Learning" required style="width:100%; padding: 14px 18px; margin-bottom: 15px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: white; font-size: 1rem; outline: none;">
+                <button type="submit" class="btn btn-primary" id="custom-course-submit-btn" style="width: 100%; padding: 14px; font-size: 1rem; background: linear-gradient(135deg, #10b981, #6366f1); border: none;">
+                    <i class="fas fa-bolt" style="margin-right: 6px;"></i> Prepare My Course
+                </button>
+            </form>
+            <div id="custom-course-status" style="display: none; margin-top: 20px;">
+                <div style="font-size: 2.2rem; color: #a5b4fc; margin-bottom: 10px;"><i class="fas fa-spinner fa-spin"></i></div>
+                <p id="custom-course-status-text" style="color: #a5b4fc; font-weight: 500;">AI is crafting your course curriculum...</p>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
